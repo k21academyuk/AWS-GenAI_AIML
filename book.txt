@@ -82,7 +82,6 @@ Letting Go of Fixed Schedules
 Live a Little
 Recommended Reading
 Acknowledgments
-About the Author
 
 
 
@@ -878,39 +877,11 @@ Shelton, Hal. The Secrets to Writing a Successful Business Plan: A Pro Shares a 
 
 
 
-ACKNOWLEDGMENTS
-This book owes its polish to two former colleagues of mine, who graciously volunteered to spend hours of their time providing meticulous feedback and edits on its first draft.
-I extend a huge thank-you to Aaron Dykstra, who produced pages of detailed notes. Aaron’s feedback ranged from stylistic improvements, to improving the flow and continuity of this book. It’s much easier to read thanks to the time he spent with it, and his encouragement to add more anecdotes to tie my advice to real world scenarios.
-Michal Bryc also provided hugely valuable feedback, both big and small. Michal spotted everything from typos to entire sections that should have been there. Most importantly, he pushed me to include even more information and statistics to back up the advice within these pages.
-Aaron and Michal both took many valuable hours out of their life for this effort, and I can’t thank them enough.
-Of course I also acknowledge my family – my wife and two daughters. Living a life of self-employment wouldn’t be nearly as enjoyable without having them to share it with.
 
 
 
 
-ABOUT THE AUTHOR
 
-
-Frank Kane is the owner and sole employee of Sundog Software, LLC, a lifestyle business that produces computer graphic technology for virtual-reality oceans, skies, and clouds. Sundog Software became Frank's full time focus in 2012 at the age of 41, and has grown from $100,000 annual revenue in 2012 to over $300,000 in 2014.
-Frank received a degree in electrical engineering from the University of Massachusetts at Dartmouth, and spent the early part of his career as a software developer on computer video games for Sierra Online in California, and at Looking Glass Studios in Boston.  Frank later spent nine years at Amazon.com in Seattle, where he progressed from a software engineer to a senior manager in charge of various parts of Amazon's personalization, recommendation, and content management technologies.  As his last corporate job, Frank was senior manager in charge of technology at IMDb.com, a subsidiary of Amazon. Personal circumstances forced Frank to leave IMDb in 2012, move away from Seattle, and focus on growing Sundog Software instead.
-Frank lives in the Orlando area with his wife and two daughters. He enjoys hanging out at theme parks, collecting Star Trek memorabilia, and writing about himself in the third person.
-
-
-
-
-1 The Impact of Business Requirments on the Success of Technology Projects, IAG Consulting.
-2 “Your commute is costing you more than you realize”, Reuters, May 27, 2014. http://www.reuters.com/article/2014/05/27/us-usa-commute-costs-idUSKBN0E721M20140527
-3 “How Many Times Will You Crash Your Car?”, Forbes, http://www.forbes.com/sites/moneybuilder/2011/07/27/how-many-times-will-you-crash-your-car/
-4 National Safety Council, 2011
-5 Brookings Institution, 2015
-6 Council for Community and Economic Research, 2014.
-7 http://tgeonetta.com/cost-of-living-vs-salary-best-cities-for-software-developers-and-engineers/
-8 “The average work week is now 47 hours”, The Washington Post, September 2, 2014
-9 http://www.apa.org/helpcenter/workplace-stress.aspx
-10 “Stress… At Work”, DHHS (NIOSH) Publication Number 99-101. http://www.cdc.gov/niosh/docs/99-101/
-11 http://www.businessinsider.com/startup-odds-of-success-2013-5
-12 There is an exception– if you set yourself up as an employee of your own company, which is treated separately for tax purposes, and your company pays unemployment insurance premiums to the state– you actually can collect unemployment benefits if you close your business and essentially lay yourself off. Talk to your accountant for more details.
-13 This is when websites generate a bunch of traffic to your website, with the sole purpose of tricking you into checking to see who they are when you see them as a large traffic source in Google Analytics.
 ---------------
 
 ------------------------------------------------------------
