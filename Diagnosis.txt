@@ -1,0 +1,12 @@
+Pt is a 65 yo man, retired engineer with past medical history that includes
+   - hypertension and type 2 diabetes.
+He presents today with shortness of breath and swelling in his ankles.
+HPI : Difficulty breathing at night, worsening over the past week. Mild chest discomfort, not radiating.
+Meds : Metformin 500 mg po bid,
+            Lisinopril 10 mg po daily
+HEENT : No nasal discharge, normal oropharynx.
+Lungs : Bibasilar crackles.
+Heart : Irregular heartbeat, mild systolic murmur.
+Skin :  Moderate pitting edema in both ankles.
+
+Follow-up in two weeks
