@@ -1,0 +1,13 @@
+import pandas as pd
+import numpy as np
+
+
+# Assuming model_data is already loaded as a DataFrame
+
+
+# Shuffle the data and split into train and test sets
+train_data, test_data = np.split(model_data.sample(frac=1, random_state=1729), [int(0.7 * len(model_data))])
+
+
+# Print the shapes of the resulting DataFrames
+print(train_data.shape, test_data.shape)
