@@ -1,0 +1,5 @@
+The duration of MLOps Engineering on AWS is 3 days
+The duration of Building Data Lakes on AWS is 1 day
+The duration of Authoring Visual Analytics using Amazon QuickSight is 2 days
+The duration of Architecting on AWS is 4 days
+The duration of Planning and Designing Databases is 3 days
