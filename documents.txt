@@ -1,0 +1,6 @@
+The price of product number 12345 is 10$
+The price of product number 3241 is 40$
+The price of product number 7123 is 13$
+The price of product number 9823 is 33$
+The price of product number 1982 is 63$
+The price of product number 5723 is 76$
