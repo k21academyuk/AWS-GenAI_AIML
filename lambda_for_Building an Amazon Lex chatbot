@@ -1,0 +1,632 @@
+import https from 'https';
+
+// ============================================
+// CONFIGURATION
+// ============================================
+const CONFIG = {
+  WEATHER_API_KEY: process.env.OPENWEATHER_API_KEY || '',
+  NEWS_API_KEY: process.env.NEWS_API_KEY || ''
+};
+
+// ============================================
+// MAIN HANDLER
+// ============================================
+export const handler = async (event, context) => {
+  console.log('Event:', JSON.stringify(event, null, 2));
+  
+  const intentName = event.sessionState?.intent?.name;
+  const slots = event.sessionState?.intent?.slots || {};
+  const sessionAttributes = event.sessionState?.sessionAttributes || {};
+  
+  try {
+    let response;
+    
+    switch (intentName) {
+      case 'CountryInfo':
+        response = await handleCountryInfo(slots, sessionAttributes, event);
+        break;
+      
+      case 'WeatherInfo':
+        response = await handleWeather(slots, sessionAttributes, event);
+        break;
+      
+      case 'CurrencyConversion':
+        response = await handleCurrencyConversion(slots, sessionAttributes, event);
+        break;
+      
+      case 'TravelRecommendations':
+        response = await handleTravelRecommendations(slots, sessionAttributes, event);
+        break;
+      
+      case 'FlightStatus':
+        response = await handleFlightStatus(slots, sessionAttributes, event);
+        break;
+      
+      case 'TravelItinerary':
+        response = await handleItinerary(slots, sessionAttributes, event);
+        break;
+      
+      default:
+        response = buildResponse(
+          'Fulfilled',
+          'I can help you with country information, weather, currency conversion, travel recommendations, flight status, and itinerary planning. What would you like to know?',
+          sessionAttributes,
+          event
+        );
+    }
+    
+    return response;
+    
+  } catch (error) {
+    console.error('Error:', error);
+    return buildResponse(
+      'Failed',
+      `Sorry, I encountered an error: ${error.message}. Please try again.`,
+      sessionAttributes,
+      event
+    );
+  }
+};
+
+// ============================================
+// INTENT HANDLERS
+// ============================================
+
+async function handleCountryInfo(slots, sessionAttributes, event) {
+  console.log('CountryInfo Handler - Slots:', JSON.stringify(slots, null, 2));
+  
+  // Try multiple ways to extract slot values
+  const country = slots.target_countries?.value?.interpretedValue || 
+                  slots.target_countries?.value?.originalValue ||
+                  slots.target_countries?.interpretedValue;
+                  
+  const infoType = slots.item?.value?.interpretedValue || 
+                   slots.item?.value?.originalValue ||
+                   slots.item?.interpretedValue ||
+                   'all'; // Default to 'all' if not specified
+  
+  console.log('Extracted country:', country);
+  console.log('Extracted infoType:', infoType);
+  
+  if (!country) {
+    return buildResponse(
+      'Failed',
+      'Please specify a country. For example: "What is the capital of France?" or "Tell me about Japan"',
+      sessionAttributes,
+      event
+    );
+  }
+  
+  if (!infoType) {
+    return buildResponse(
+      'Failed',
+      'Please specify what information you need. For example: capital, currency, language, population, or all',
+      sessionAttributes,
+      event
+    );
+  }
+  
+  try {
+    const normalizedCountry = normalizeCountryName(country);
+    console.log('Normalized country:', normalizedCountry);
+    
+    const countryData = await fetchCountryData(normalizedCountry);
+    console.log('Country data fetched:', countryData.name);
+    
+    sessionAttributes.lastCountry = countryData.name;
+    sessionAttributes.lastCountryCode = countryData.code;
+    sessionAttributes.lastCapital = countryData.capital;
+    
+    let message = formatCountryResponse(infoType.toLowerCase(), countryData);
+    message += `\n\n💡 You can also ask:\n• "Weather in ${countryData.capital}"\n• "Convert USD to ${countryData.currencyCode}"\n• "Travel recommendations"`;
+    
+    return buildResponse('Fulfilled', message, sessionAttributes, event);
+  } catch (error) {
+    console.error('CountryInfo Error:', error);
+    return buildResponse(
+      'Failed',
+      `Sorry, I couldn't find information about ${country}. Please check the spelling or try another country.`,
+      sessionAttributes,
+      event
+    );
+  }
+}
+
+async function handleWeather(slots, sessionAttributes, event) {
+  let city = slots.city?.value?.interpretedValue;
+  
+  if (!city && sessionAttributes.lastCapital) {
+    city = sessionAttributes.lastCapital;
+  }
+  
+  if (!city) {
+    return buildResponse(
+      'Failed',
+      'Please specify a city. For example: "Weather in Tokyo"',
+      sessionAttributes,
+      event
+    );
+  }
+  
+  if (!CONFIG.WEATHER_API_KEY) {
+    return buildResponse(
+      'Failed',
+      'Weather API is not configured. Please contact the administrator.',
+      sessionAttributes,
+      event
+    );
+  }
+  
+  try {
+    const weatherData = await fetchWeather(city);
+    
+    const message = `
+🌤️ Weather in ${weatherData.city}
+
+Current Conditions:
+- Temperature: ${weatherData.temp}°C (feels like ${weatherData.feelsLike}°C)
+- Condition: ${weatherData.description}
+- Humidity: ${weatherData.humidity}%
+- Wind Speed: ${weatherData.windSpeed} m/s
+
+Travel Tip: ${generateWeatherAdvice(weatherData)}
+    `.trim();
+    
+    sessionAttributes.lastWeatherCity = city;
+    
+    return buildResponse('Fulfilled', message, sessionAttributes, event);
+  } catch (error) {
+    return buildResponse(
+      'Failed',
+      `Sorry, I couldn't find weather data for ${city}. Please try another city.`,
+      sessionAttributes,
+      event
+    );
+  }
+}
+
+async function handleCurrencyConversion(slots, sessionAttributes, event) {
+  const amount = parseFloat(slots.amount?.value?.interpretedValue) || 1;
+  const fromCurrency = slots.from_currency?.value?.interpretedValue?.toUpperCase();
+  const toCurrency = slots.to_currency?.value?.interpretedValue?.toUpperCase();
+  
+  if (!fromCurrency || !toCurrency) {
+    return buildResponse(
+      'Failed',
+      'Please specify both currencies. For example: "Convert 100 USD to EUR"',
+      sessionAttributes,
+      event
+    );
+  }
+  
+  try {
+    const conversionData = await fetchCurrencyConversion(fromCurrency, toCurrency, amount);
+    
+    const message = `
+💱 Currency Conversion
+
+${amount} ${fromCurrency} = ${conversionData.convertedAmount} ${toCurrency}
+
+Exchange Rate: 1 ${fromCurrency} = ${conversionData.rate} ${toCurrency}
+Last Updated: ${conversionData.lastUpdated}
+    `.trim();
+    
+    sessionAttributes.lastFromCurrency = fromCurrency;
+    sessionAttributes.lastToCurrency = toCurrency;
+    
+    return buildResponse('Fulfilled', message, sessionAttributes, event);
+  } catch (error) {
+    return buildResponse(
+      'Failed',
+      `Sorry, I couldn't convert ${fromCurrency} to ${toCurrency}. Please check the currency codes.`,
+      sessionAttributes,
+      event
+    );
+  }
+}
+
+async function handleTravelRecommendations(slots, sessionAttributes, event) {
+  const budget = slots.budget?.value?.interpretedValue?.toLowerCase() || 'moderate';
+  const interests = slots.interests?.value?.interpretedValue?.toLowerCase() || 'culture';
+  
+  const recommendations = getTravelRecommendations(budget, interests);
+  
+  const message = `
+✈️ Travel Recommendations
+
+Based on your preferences (${budget} budget, ${interests}):
+
+${recommendations.destinations.map((dest, i) => `
+${i + 1}. ${dest.name} ${dest.flag}
+   • Best Time: ${dest.bestTime}
+   • Highlights: ${dest.highlights}
+   • Budget: ${dest.budgetRange}
+   • Flight Time: ${dest.flightTime}
+`).join('\n')}
+
+💡 Ask me about weather or currency for any of these destinations!
+  `.trim();
+  
+  return buildResponse('Fulfilled', message, sessionAttributes, event);
+}
+
+async function handleFlightStatus(slots, sessionAttributes, event) {
+  const flightNumber = slots.flight_number?.value?.interpretedValue;
+  
+  if (!flightNumber) {
+    return buildResponse(
+      'Failed',
+      'Please provide a flight number. For example: "Flight status for AA123"',
+      sessionAttributes,
+      event
+    );
+  }
+  
+  const flightData = {
+    flightNumber: flightNumber.toUpperCase(),
+    status: 'On Time',
+    departure: {
+      airport: 'JFK',
+      city: 'New York',
+      scheduled: '14:30',
+      gate: 'B23'
+    },
+    arrival: {
+      airport: 'LHR',
+      city: 'London',
+      scheduled: '02:45+1',
+      gate: 'T5-A12'
+    },
+    aircraft: 'Boeing 777-300ER',
+    duration: '7h 15m'
+  };
+  
+  const message = `
+✈️ Flight Status: ${flightData.flightNumber}
+
+Status: ${flightData.status} ✅
+
+Departure:
+- ${flightData.departure.city} (${flightData.departure.airport})
+- Time: ${flightData.departure.scheduled}
+- Gate: ${flightData.departure.gate}
+
+Arrival:
+- ${flightData.arrival.city} (${flightData.arrival.airport})
+- Time: ${flightData.arrival.scheduled}
+- Gate: ${flightData.arrival.gate}
+
+Aircraft: ${flightData.aircraft}
+Duration: ${flightData.duration}
+
+🔔 Want weather info for ${flightData.arrival.city}?
+  `.trim();
+  
+  sessionAttributes.lastFlight = flightNumber;
+  
+  return buildResponse('Fulfilled', message, sessionAttributes, event);
+}
+
+async function handleItinerary(slots, sessionAttributes, event) {
+  const destination = slots.destination?.value?.interpretedValue;
+  const duration = parseInt(slots.duration?.value?.interpretedValue) || 3;
+  
+  if (!destination) {
+    return buildResponse(
+      'Failed',
+      'Please specify your destination. For example: "Create 3 day itinerary for Paris"',
+      sessionAttributes,
+      event
+    );
+  }
+  
+  const itinerary = generateItinerary(destination, duration);
+  
+  const message = `
+🗓️ ${duration}-Day Itinerary for ${destination}
+
+${itinerary.days.map((day, i) => `
+Day ${i + 1}: ${day.theme}
+${day.activities.map(act => `  ${act.time} - ${act.name}: ${act.description}`).join('\n')}
+`).join('\n')}
+
+💰 Estimated Budget: ${itinerary.budget}
+🍽️ Must-Try Food: ${itinerary.food}
+⚠️ Travel Tips: ${itinerary.tips}
+
+Would you like weather or currency info for ${destination}?
+  `.trim();
+  
+  return buildResponse('Fulfilled', message, sessionAttributes, event);
+}
+
+// ============================================
+// API INTEGRATION FUNCTIONS
+// ============================================
+
+function fetchCountryData(countryName) {
+  return new Promise((resolve, reject) => {
+    const url = `https://restcountries.com/v3.1/name/${encodeURIComponent(countryName)}?fullText=false`;
+    
+    https.get(url, (res) => {
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', () => {
+        try {
+          const data = JSON.parse(body);
+          if (!Array.isArray(data) || data.length === 0) {
+            reject(new Error('Country not found'));
+            return;
+          }
+          
+          const country = data[0];
+          resolve({
+            name: country.name.common,
+            officialName: country.name.official,
+            capital: country.capital?.[0] || 'N/A',
+            code: country.cca2,
+            region: country.region,
+            subregion: country.subregion,
+            population: country.population?.toLocaleString(),
+            area: country.area ? `${country.area.toLocaleString()} km²` : 'N/A',
+            languages: country.languages ? Object.values(country.languages).join(', ') : 'N/A',
+            currencies: country.currencies ? Object.entries(country.currencies).map(([code, curr]) => `${curr.name} (${code})`).join(', ') : 'N/A',
+            currencyCode: country.currencies ? Object.keys(country.currencies)[0] : 'N/A',
+            timezone: country.timezones?.[0] || 'N/A',
+            flag: country.flag || '',
+            borders: country.borders || [],
+            latlng: country.latlng || []
+          });
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }).on('error', reject);
+  });
+}
+
+function fetchWeather(city) {
+  return new Promise((resolve, reject) => {
+    const apiKey = CONFIG.WEATHER_API_KEY;
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
+    
+    https.get(url, (res) => {
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', () => {
+        try {
+          const data = JSON.parse(body);
+          
+          if (data.cod !== 200) {
+            reject(new Error('Weather data not found'));
+            return;
+          }
+          
+          resolve({
+            city: data.name,
+            temp: Math.round(data.main.temp),
+            feelsLike: Math.round(data.main.feels_like),
+            description: data.weather[0].description,
+            humidity: data.main.humidity,
+            windSpeed: data.wind.speed,
+            icon: getWeatherEmoji(data.weather[0].main)
+          });
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }).on('error', reject);
+  });
+}
+
+function fetchCurrencyConversion(from, to, amount) {
+  return new Promise((resolve, reject) => {
+    const url = `https://api.exchangerate-api.com/v4/latest/${from}`;
+    
+    https.get(url, (res) => {
+      let body = '';
+      res.on('data', chunk => body += chunk);
+      res.on('end', () => {
+        try {
+          const data = JSON.parse(body);
+          
+          if (!data.rates || !data.rates[to]) {
+            reject(new Error('Currency not found'));
+            return;
+          }
+          
+          const rate = data.rates[to];
+          const converted = (amount * rate).toFixed(2);
+          
+          resolve({
+            convertedAmount: converted,
+            rate: rate.toFixed(4),
+            lastUpdated: new Date(data.time_last_updated * 1000).toLocaleDateString()
+          });
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }).on('error', reject);
+  });
+}
+
+function getTravelRecommendations(budget, interests) {
+  const allDestinations = [
+    {
+      name: 'Bali, Indonesia',
+      flag: '🇮🇩',
+      bestTime: 'April-October',
+      highlights: 'Beaches, Temples, Rice Terraces',
+      budgetRange: '$50-100/day',
+      flightTime: '12-18 hours',
+      budget: ['budget', 'moderate'],
+      interests: ['relaxation', 'culture', 'nature']
+    },
+    {
+      name: 'Prague, Czech Republic',
+      flag: '🇨🇿',
+      bestTime: 'May-September',
+      highlights: 'Historic Architecture, Beer Culture, Castles',
+      budgetRange: '$40-80/day',
+      flightTime: '8-12 hours',
+      budget: ['budget', 'moderate'],
+      interests: ['culture', 'history', 'food']
+    },
+    {
+      name: 'Tokyo, Japan',
+      flag: '🇯🇵',
+      bestTime: 'March-May, September-November',
+      highlights: 'Technology, Temples, Cuisine, Shopping',
+      budgetRange: '$100-200/day',
+      flightTime: '12-14 hours',
+      budget: ['moderate', 'luxury'],
+      interests: ['culture', 'food', 'shopping', 'adventure']
+    },
+    {
+      name: 'Iceland',
+      flag: '🇮🇸',
+      bestTime: 'June-August',
+      highlights: 'Northern Lights, Glaciers, Hot Springs',
+      budgetRange: '$150-250/day',
+      flightTime: '5-8 hours',
+      budget: ['moderate', 'luxury'],
+      interests: ['nature', 'adventure']
+    },
+    {
+      name: 'Portugal',
+      flag: '🇵🇹',
+      bestTime: 'April-October',
+      highlights: 'Beaches, Wine, Historic Cities',
+      budgetRange: '$50-90/day',
+      flightTime: '8-12 hours',
+      budget: ['budget', 'moderate'],
+      interests: ['relaxation', 'culture', 'food']
+    }
+  ];
+  
+  const filtered = allDestinations.filter(dest => 
+    dest.budget.includes(budget) && dest.interests.includes(interests)
+  );
+  
+  return { 
+    destinations: filtered.length > 0 ? filtered.slice(0, 3) : allDestinations.slice(0, 3)
+  };
+}
+
+function generateItinerary(destination, days) {
+  const templates = {
+    1: [
+      { time: '09:00', name: 'City Tour', description: 'Explore main landmarks' },
+      { time: '14:00', name: 'Local Cuisine', description: 'Try authentic local food' },
+      { time: '19:00', name: 'Evening Walk', description: 'Discover nightlife' }
+    ],
+    2: [
+      { time: '09:00', name: 'Museum Visit', description: 'Cultural immersion' },
+      { time: '14:00', name: 'Shopping District', description: 'Browse local markets' },
+      { time: '19:00', name: 'Traditional Show', description: 'Cultural performance' }
+    ],
+    3: [
+      { time: '09:00', name: 'Day Trip', description: 'Visit nearby attractions' },
+      { time: '14:00', name: 'Beach/Nature', description: 'Outdoor activities' },
+      { time: '19:00', name: 'Farewell Dinner', description: 'Special dining experience' }
+    ]
+  };
+  
+  return {
+    days: Array.from({ length: days }, (_, i) => ({
+      theme: `Explore ${destination} - Day ${i + 1}`,
+      activities: templates[(i % 3) + 1]
+    })),
+    budget: '$300-500',
+    food: 'Local specialties and street food',
+    tips: 'Stay hydrated, use local transport, learn basic phrases'
+  };
+}
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+function normalizeCountryName(country) {
+  const aliases = {
+    'usa': 'United States',
+    'us': 'United States',
+    'america': 'United States',
+    'uk': 'United Kingdom',
+    'britain': 'United Kingdom',
+    'uae': 'United Arab Emirates'
+  };
+  
+  return aliases[country.toLowerCase()] || country;
+}
+
+function formatCountryResponse(infoType, data) {
+  const responses = {
+    'capital': `The capital of ${data.name} is ${data.capital} ${data.flag}`,
+    'currency': `${data.name} uses ${data.currencies} ${data.flag}`,
+    'language': `Languages spoken in ${data.name}: ${data.languages} ${data.flag}`,
+    'population': `${data.name} has a population of ${data.population} ${data.flag}`,
+    'region': `${data.name} is in ${data.region} (${data.subregion}) ${data.flag}`,
+    'timezone': `${data.name} timezone: ${data.timezone} ${data.flag}`,
+    'area': `${data.name} area: ${data.area} ${data.flag}`,
+    'all': `
+${data.name} ${data.flag}
+
+- Capital: ${data.capital}
+- Population: ${data.population}
+- Currency: ${data.currencies}
+- Languages: ${data.languages}
+- Region: ${data.region}
+- Area: ${data.area}
+- Timezone: ${data.timezone}
+    `.trim()
+  };
+  
+  return responses[infoType] || responses['all'];
+}
+
+function generateWeatherAdvice(weather) {
+  if (weather.temp > 30) return 'Very hot! Stay hydrated and use sunscreen.';
+  if (weather.temp < 10) return 'Cold! Bring warm clothing.';
+  if (weather.humidity > 80) return 'High humidity. Light clothing recommended.';
+  return 'Pleasant weather for outdoor activities!';
+}
+
+function getWeatherEmoji(condition) {
+  const emojis = {
+    'Clear': '☀️',
+    'Clouds': '☁️',
+    'Rain': '🌧️',
+    'Snow': '❄️',
+    'Thunderstorm': '⛈️'
+  };
+  return emojis[condition] || '🌤️';
+}
+
+// ============================================
+// FIXED BUILD RESPONSE FUNCTION
+// ============================================
+function buildResponse(state, message, sessionAttributes = {}, event = {}) {
+  // Get the intent name from the event
+  const intentName = event.sessionState?.intent?.name || 'UnknownIntent';
+  
+  return {
+    sessionState: {
+      sessionAttributes: sessionAttributes,
+      dialogAction: {
+        type: 'Close'
+      },
+      intent: {
+        name: intentName,
+        state: state
+      }
+    },
+    messages: [
+      {
+        contentType: 'PlainText',
+        content: message
+      }
+    ]
+  };
+}
