@@ -24,7 +24,7 @@
       "Sid": "S3OutputBucketListAccess",
       "Effect": "Allow",
       "Action": "s3:ListBucket",
-      "Resource": "arn:aws:s3:::ai-stylist-outputs-*"
+      "Resource": "arn:aws:s3:::aistylist-demo-bucket-*"
     },
     {
       "Sid": "CloudWatchLogsAccess",
