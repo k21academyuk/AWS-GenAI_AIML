@@ -3,7 +3,7 @@ AI Stylist — Lambda Handler (Gender-Neutral Version 2.0)
 =========================================================
 
 Features:
-- Amazon Bedrock Claude 3 Sonnet for outfit descriptions
+- Amazon Bedrock Claude Sonnet 4 for outfit descriptions
 - Amazon Nova Canvas for image generation
 - Gender-aware prompting (men/women/neutral)
 - CORS support for web frontend
@@ -12,7 +12,7 @@ Features:
 
 Author: AI Stylist Team
 Version: 2.0 (Gender-Neutral)
-Updated: February 2026
+Updated: April 2026
 """
 
 import json
@@ -43,7 +43,7 @@ s3 = boto3.client("s3")
 # ═══════════════════════════════════════════════════════════════════════════
 
 S3_BUCKET       = os.environ["S3_BUCKET_NAME"]
-CLAUDE_MODEL_ID = os.environ.get("CLAUDE_MODEL_ID", "anthropic.claude-3-sonnet-20240229-v1:0")
+CLAUDE_MODEL_ID = os.environ.get("CLAUDE_MODEL_ID", "us.anthropic.claude-sonnet-4-6-20250514-v1:0")
 NOVA_MODEL_ID   = os.environ.get("NOVA_MODEL_ID", "amazon.nova-canvas-v1:0")
 NUM_IMAGES      = int(os.environ.get("NUM_IMAGES", "4"))
 IMAGE_EXPIRY    = int(os.environ.get("IMAGE_EXPIRY_SECS", "3600"))
@@ -63,7 +63,7 @@ def lambda_handler(event, context):
         "season": "Summer",
         "styles": ["Minimalist", "Classic"],
         "colors": ["Earth Tones"],
-        "gender": "neutral",              // NEW: "men", "women", or "neutral"
+        "gender": "neutral",
         "custom_prompt": "Optional text"
     }
     
@@ -96,12 +96,12 @@ def lambda_handler(event, context):
         logger.info(f"Received request: {json.dumps(body)}")
         
         # Extract user preferences
-        occasion = body.get("occasion", "Casual")
-        season = body.get("season", "Summer")
-        styles = body.get("styles", ["Classic"])
-        colors = body.get("colors", ["Neutral"])
+        occasion      = body.get("occasion", "Casual")
+        season        = body.get("season", "Summer")
+        styles        = body.get("styles", ["Classic"])
+        colors        = body.get("colors", ["Neutral"])
         custom_prompt = body.get("custom_prompt", "").strip()
-        gender_pref = body.get("gender", "neutral")  # NEW!
+        gender_pref   = body.get("gender", "neutral")
         
         # Validate gender preference
         if gender_pref not in ["men", "women", "neutral"]:
@@ -110,7 +110,7 @@ def lambda_handler(event, context):
         logger.info(f"Preferences: {occasion}, {season}, {styles}, {colors}, Gender: {gender_pref}")
         
         # ───────────────────────────────────────────────────────────────────
-        # Generate Outfit Descriptions with Claude
+        # Generate Outfit Descriptions with Claude Sonnet 4
         # ───────────────────────────────────────────────────────────────────
         outfit_descriptions = generate_outfit_descriptions(
             occasion=occasion,
@@ -135,11 +135,11 @@ def lambda_handler(event, context):
                 )
                 
                 results.append({
-                    "name": outfit.get("name", f"Outfit {i+1}"),
+                    "name":        outfit.get("name", f"Outfit {i+1}"),
                     "description": outfit.get("description", ""),
-                    "image_url": image_url,
-                    "gender": gender_pref,
-                    "index": i
+                    "image_url":   image_url,
+                    "gender":      gender_pref,
+                    "index":       i
                 })
                 
                 logger.info(f"✅ Generated outfit {i+1}/{NUM_IMAGES}")
@@ -147,12 +147,12 @@ def lambda_handler(event, context):
             except Exception as img_error:
                 logger.error(f"Image generation failed for outfit {i}: {img_error}")
                 results.append({
-                    "name": outfit.get("name", f"Outfit {i+1}"),
+                    "name":        outfit.get("name", f"Outfit {i+1}"),
                     "description": outfit.get("description", ""),
-                    "image_url": None,
-                    "error": str(img_error),
-                    "gender": gender_pref,
-                    "index": i
+                    "image_url":   None,
+                    "error":       str(img_error),
+                    "gender":      gender_pref,
+                    "index":       i
                 })
         
         # ───────────────────────────────────────────────────────────────────
@@ -160,17 +160,17 @@ def lambda_handler(event, context):
         # ───────────────────────────────────────────────────────────────────
         return cors_response(200, {
             "success": True,
-            "count": len(results),
+            "count":   len(results),
             "outfits": results,
             "preferences": {
                 "occasion": occasion,
-                "season": season,
-                "styles": styles,
-                "colors": colors,
-                "gender": gender_pref
+                "season":   season,
+                "styles":   styles,
+                "colors":   colors,
+                "gender":   gender_pref
             },
             "models_used": {
-                "text": CLAUDE_MODEL_ID,
+                "text":  CLAUDE_MODEL_ID,
                 "image": NOVA_MODEL_ID
             },
             "generated_at": datetime.utcnow().isoformat() + "Z"
@@ -180,7 +180,7 @@ def lambda_handler(event, context):
         logger.error(f"Invalid JSON in request body: {e}")
         return cors_response(400, {
             "success": False,
-            "error": "Invalid JSON in request body",
+            "error":   "Invalid JSON in request body",
             "details": str(e)
         })
     
@@ -188,18 +188,18 @@ def lambda_handler(event, context):
         logger.error(f"Unexpected error: {e}", exc_info=True)
         return cors_response(500, {
             "success": False,
-            "error": str(e),
-            "type": type(e).__name__
+            "error":   str(e),
+            "type":    type(e).__name__
         })
 
 
 # ═══════════════════════════════════════════════════════════════════════════
-# CLAUDE TEXT GENERATION (Gender-Aware)
+# CLAUDE SONNET 4 TEXT GENERATION (Gender-Aware)
 # ═══════════════════════════════════════════════════════════════════════════
 
 def generate_outfit_descriptions(occasion, season, styles, colors, custom_prompt, gender):
     """
-    Call Claude 3 Sonnet to generate gender-appropriate outfit descriptions.
+    Call Claude Sonnet 4 to generate gender-appropriate outfit descriptions.
     
     Args:
         occasion (str): Event type (e.g., "Business Casual")
@@ -215,8 +215,8 @@ def generate_outfit_descriptions(occasion, season, styles, colors, custom_prompt
     
     # Build gender-specific context
     gender_contexts = {
-        "men": "masculine styles, menswear, tailored for male body type, men's fashion",
-        "women": "feminine styles, womenswear, tailored for female body type, women's fashion",
+        "men":     "masculine styles, menswear, tailored for male body type, men's fashion",
+        "women":   "feminine styles, womenswear, tailored for female body type, women's fashion",
         "neutral": "gender-neutral styles, unisex fashion, adaptable silhouettes, inclusive design"
     }
     gender_context = gender_contexts.get(gender, gender_contexts["neutral"])
@@ -257,7 +257,7 @@ Color Palette: {', '.join(colors)}
 Make each outfit visually distinct and professionally styled for {gender}.
 Return only the JSON."""
     
-    # Prepare request
+    # Prepare request body — Claude Sonnet 4 format
     request_body = {
         "anthropic_version": "bedrock-2023-05-31",
         "max_tokens": 3000,
@@ -267,9 +267,9 @@ Return only the JSON."""
         ]
     }
     
-    logger.info(f"Calling Claude for {gender} outfits...")
+    logger.info(f"Calling Claude Sonnet 4 ({CLAUDE_MODEL_ID}) for {gender} outfits...")
     
-    # Invoke Claude
+    # Invoke Claude Sonnet 4
     response = bedrock.invoke_model(
         modelId=CLAUDE_MODEL_ID,
         body=json.dumps(request_body),
@@ -278,10 +278,10 @@ Return only the JSON."""
     )
     
     # Parse response
-    response_body = json.loads(response["body"].read())
-    raw_text = response_body["content"][0]["text"].strip()
+    response_body   = json.loads(response["body"].read())
+    raw_text        = response_body["content"][0]["text"].strip()
     
-    logger.info(f"Claude response preview: {raw_text[:200]}...")
+    logger.info(f"Claude Sonnet 4 response preview: {raw_text[:200]}...")
     
     # Clean markdown fences if present
     if raw_text.startswith("```"):
@@ -294,13 +294,13 @@ Return only the JSON."""
         raw_text = raw_text[:-3].strip()
     
     # Parse JSON
-    parsed = json.loads(raw_text)
+    parsed  = json.loads(raw_text)
     outfits = parsed.get("outfits", [])
     
     if not outfits:
-        raise ValueError("Claude returned no outfits in response")
+        raise ValueError("Claude Sonnet 4 returned no outfits in response")
     
-    logger.info(f"✅ Claude generated {len(outfits)} outfit descriptions")
+    logger.info(f"✅ Claude Sonnet 4 generated {len(outfits)} outfit descriptions")
     
     return outfits
 
@@ -314,7 +314,7 @@ def generate_and_upload_image(outfit, index, gender):
     Generate image with Nova Canvas using gender-appropriate prompts.
     
     Args:
-        outfit (dict): Outfit details from Claude
+        outfit (dict): Outfit details from Claude Sonnet 4
         index (int): Outfit index (0-3)
         gender (str): "men", "women", or "neutral"
     
@@ -329,7 +329,7 @@ def generate_and_upload_image(outfit, index, gender):
     )
     
     # ───────────────────────────────────────────────────────────────────────
-    # Add Gender-Specific Styling (CRITICAL for preventing bias!)
+    # Gender-Specific Styling
     # ───────────────────────────────────────────────────────────────────────
     
     if gender == "men":
@@ -375,15 +375,15 @@ def generate_and_upload_image(outfit, index, gender):
     nova_request = {
         "taskType": "TEXT_IMAGE",
         "textToImageParams": {
-            "text": image_prompt,
+            "text":         image_prompt,
             "negativeText": negative_prompt
         },
         "imageGenerationConfig": {
             "numberOfImages": 1,
-            "height": 512,
-            "width": 512,
-            "cfgScale": 8.5,  # Higher = follows prompt more closely
-            "seed": (index + 1) * 42  # Different seed per image
+            "height":         512,
+            "width":          512,
+            "cfgScale":       8.5,
+            "seed":           (index + 1) * 42
         }
     }
     
@@ -400,10 +400,10 @@ def generate_and_upload_image(outfit, index, gender):
     
     # Parse response
     response_body = json.loads(nova_response["body"].read())
-    image_b64 = response_body["images"][0]
-    image_bytes = base64.b64decode(image_b64)
+    image_b64     = response_body["images"][0]
+    image_bytes   = base64.b64decode(image_b64)
     
-    logger.info(f"✅ Nova generated {len(image_bytes)} bytes")
+    logger.info(f"✅ Nova Canvas generated {len(image_bytes)} bytes")
     
     # ───────────────────────────────────────────────────────────────────────
     # Upload to S3
@@ -411,7 +411,7 @@ def generate_and_upload_image(outfit, index, gender):
     
     timestamp = datetime.utcnow().strftime("%Y%m%d-%H%M%S")
     unique_id = str(uuid.uuid4())[:8]
-    s3_key = f"outfits/{gender}/{timestamp}/{unique_id}-outfit-{index}.png"
+    s3_key    = f"outfits/{gender}/{timestamp}/{unique_id}-outfit-{index}.png"
     
     s3.put_object(
         Bucket=S3_BUCKET,
@@ -420,9 +420,9 @@ def generate_and_upload_image(outfit, index, gender):
         ContentType="image/png",
         Metadata={
             "outfit_name": outfit.get("name", ""),
-            "gender": gender,
+            "gender":      gender,
             "generated_at": timestamp,
-            "model": NOVA_MODEL_ID
+            "model":       NOVA_MODEL_ID
         }
     )
     
@@ -459,8 +459,8 @@ def cors_response(status_code, body):
     return {
         "statusCode": status_code,
         "headers": {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
+            "Content-Type":                 "application/json",
+            "Access-Control-Allow-Origin":  "*",
             "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
             "Access-Control-Allow-Methods": "POST,OPTIONS"
         },
