@@ -10,7 +10,10 @@
         "apigateway:DELETE",
         "apigateway:PATCH"
       ],
-      "Resource": "arn:aws:apigateway:us-east-1::*"
+      "Resource": [
+        "arn:aws:apigateway:us-east-1::*",
+        "arn:aws:apigateway:us-west-2::*"
+      ]
     }
   ]
 }
