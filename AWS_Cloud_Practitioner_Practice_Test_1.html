@@ -1,0 +1,2370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K21 Academy — AWS Certified Cloud Practitioner (CLF-C02) Practice Test 1</title>
+<style>
+  :root {
+    --aws-navy: #232f3e;
+    --aws-navy-2: #1a232f;
+    --aws-orange: #ff9900;
+    --aws-orange-dark: #ec7211;
+    --bg: #f2f3f3;
+    --card: #ffffff;
+    --border: #d5dbdb;
+    --text: #16191f;
+    --text-muted: #545b64;
+    --success: #1d8102;
+    --success-bg: #effff1;
+    --danger: #d13212;
+    --danger-bg: #fff4f4;
+    --warning: #b7740a;
+    --warning-bg: #fff8e7;
+    --review: #5294cf;
+    --review-bg: #e8f1fa;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Amazon Ember', 'Helvetica Neue', Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    font-size: 14px;
+  }
+
+  /* ===== Header ===== */
+  .exam-header {
+    background: var(--aws-navy);
+    color: white;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: var(--shadow-lg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .aws-logo {
+    font-weight: 700;
+    font-size: 18px;
+    letter-spacing: -0.3px;
+    white-space: nowrap;
+  }
+
+  .aws-logo span { color: var(--aws-orange); font-weight: 500; }
+
+  .exam-title {
+    font-size: 13px;
+    color: #d5dbdb;
+    border-left: 1px solid #545b64;
+    padding-left: 20px;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .timer {
+    background: var(--aws-navy-2);
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #545b64;
+  }
+
+  .timer.warning { color: var(--aws-orange); border-color: var(--aws-orange); }
+  .timer.danger { color: #ff6b6b; border-color: #ff6b6b; animation: pulse 1s infinite; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  .progress-info {
+    font-size: 13px;
+    color: #d5dbdb;
+  }
+
+  /* ===== Layout ===== */
+  .exam-container {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 20px;
+    max-width: 1400px;
+    margin: 20px auto;
+    padding: 0 20px;
+  }
+
+  /* ===== Question Panel ===== */
+  .question-panel {
+    background: var(--card);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .question-meta {
+    background: #fafafa;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+  }
+
+  .question-number {
+    font-weight: 700;
+    color: var(--aws-navy);
+  }
+
+  .question-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-review {
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-muted);
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-review:hover {
+    border-color: var(--review);
+    color: var(--review);
+  }
+
+  .btn-review.active {
+    background: var(--review);
+    color: white;
+    border-color: var(--review);
+  }
+
+  .question-body {
+    padding: 28px 32px;
+  }
+
+  .question-text {
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+
+  .multi-select-hint {
+    background: var(--warning-bg);
+    border-left: 3px solid var(--warning);
+    padding: 10px 14px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    color: #6b4500;
+    border-radius: 2px;
+  }
+
+  /* ===== Options ===== */
+  .options-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: white;
+    user-select: none;
+  }
+
+  .option:hover {
+    border-color: var(--aws-orange);
+    background: #fff9f0;
+  }
+
+  .option.selected {
+    border-color: var(--aws-orange);
+    background: #fff5e6;
+    box-shadow: 0 0 0 1px var(--aws-orange);
+  }
+
+  .option-marker {
+    flex-shrink: 0;
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    background: white;
+    transition: all 0.15s;
+  }
+
+  .option.multi .option-marker { border-radius: 3px; }
+  .option:not(.multi) .option-marker { border-radius: 50%; }
+
+  .option.selected .option-marker {
+    background: var(--aws-orange);
+    border-color: var(--aws-orange);
+    color: white;
+  }
+
+  .option-text {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.6;
+    padding-top: 1px;
+  }
+
+  /* Review mode option states */
+  .option.review-correct {
+    border-color: var(--success);
+    background: var(--success-bg);
+    box-shadow: 0 0 0 1px var(--success);
+  }
+
+  .option.review-correct .option-marker {
+    background: var(--success);
+    border-color: var(--success);
+    color: white;
+  }
+
+  .option.review-wrong {
+    border-color: var(--danger);
+    background: var(--danger-bg);
+    box-shadow: 0 0 0 1px var(--danger);
+  }
+
+  .option.review-wrong .option-marker {
+    background: var(--danger);
+    border-color: var(--danger);
+    color: white;
+  }
+
+  .review-badge {
+    margin-left: auto;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .review-badge.correct { background: var(--success); color: white; }
+  .review-badge.wrong { background: var(--danger); color: white; }
+  .review-badge.missed { background: var(--warning); color: white; }
+
+  /* ===== Footer Nav ===== */
+  .question-footer {
+    padding: 16px 32px;
+    background: #fafafa;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .btn {
+    padding: 10px 22px;
+    border-radius: 3px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-primary {
+    background: var(--aws-orange);
+    color: white;
+    border-color: var(--aws-orange-dark);
+  }
+
+  .btn-primary:hover {
+    background: var(--aws-orange-dark);
+  }
+
+  .btn-secondary {
+    background: white;
+    color: var(--text);
+    border-color: var(--border);
+  }
+
+  .btn-secondary:hover {
+    background: #f5f5f5;
+    border-color: var(--text-muted);
+  }
+
+  .btn-danger {
+    background: var(--danger);
+    color: white;
+    border-color: var(--danger);
+  }
+
+  .btn-danger:hover {
+    background: #a82a0e;
+  }
+
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* ===== Sidebar Navigator ===== */
+  .navigator {
+    background: var(--card);
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    padding: 16px;
+    position: sticky;
+    top: 80px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+  }
+
+  .navigator-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--aws-navy);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .navigator-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+
+  .nav-cell {
+    aspect-ratio: 1;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    background: white;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    position: relative;
+  }
+
+  .nav-cell:hover {
+    border-color: var(--aws-navy);
+    transform: scale(1.08);
+  }
+
+  .nav-cell.answered {
+    background: var(--aws-navy);
+    color: white;
+    border-color: var(--aws-navy);
+  }
+
+  .nav-cell.review {
+    background: var(--review);
+    color: white;
+    border-color: var(--review);
+  }
+
+  .nav-cell.review.answered::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 6px;
+    height: 6px;
+    background: var(--aws-orange);
+    border-radius: 50%;
+  }
+
+  .nav-cell.current {
+    background: var(--aws-orange);
+    color: white;
+    border-color: var(--aws-orange-dark);
+    box-shadow: 0 0 0 2px white, 0 0 0 4px var(--aws-orange);
+  }
+
+  .legend {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .legend-swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .stats-box {
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+  }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    color: var(--text-muted);
+  }
+
+  .stat-row strong { color: var(--text); }
+
+  /* ===== Start Screen ===== */
+  .start-screen, .results-screen {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+  }
+
+  .start-card, .results-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+
+  .start-header {
+    background: linear-gradient(135deg, var(--aws-navy) 0%, var(--aws-navy-2) 100%);
+    color: white;
+    padding: 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .start-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(255,153,0,0.15) 0%, transparent 70%);
+  }
+
+  .cert-badge {
+    display: inline-block;
+    background: var(--aws-orange);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+
+  .start-header h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  .start-header p {
+    color: #d5dbdb;
+    font-size: 15px;
+    position: relative;
+  }
+
+  .start-body {
+    padding: 32px 40px;
+  }
+
+  .instructions {
+    background: #f8f9fa;
+    border-left: 4px solid var(--aws-orange);
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    border-radius: 4px;
+  }
+
+  .instructions h3 {
+    color: var(--aws-navy);
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .instructions ul {
+    list-style: none;
+    font-size: 14px;
+    color: var(--text-muted);
+  }
+
+  .instructions li {
+    padding: 4px 0;
+    padding-left: 20px;
+    position: relative;
+  }
+
+  .instructions li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--aws-orange);
+    font-weight: 700;
+  }
+
+  .exam-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .info-tile {
+    background: #f8f9fa;
+    padding: 16px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+
+  .info-tile-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+
+  .info-tile-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--aws-navy);
+  }
+
+  .start-btn {
+    width: 100%;
+    padding: 16px;
+    font-size: 16px;
+    background: var(--aws-orange);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+  }
+
+  .start-btn:hover {
+    background: var(--aws-orange-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(236,114,17,0.3);
+  }
+
+  /* ===== Results ===== */
+  .results-header {
+    padding: 40px;
+    text-align: center;
+    color: white;
+  }
+
+  .results-header.pass {
+    background: linear-gradient(135deg, #1d8102 0%, #156601 100%);
+  }
+
+  .results-header.fail {
+    background: linear-gradient(135deg, #d13212 0%, #a82a0e 100%);
+  }
+
+  .score-circle {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  }
+
+  .score-value {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .results-header.pass .score-value { color: var(--success); }
+  .results-header.fail .score-value { color: var(--danger); }
+
+  .score-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .results-verdict {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .results-subtext {
+    opacity: 0.9;
+    font-size: 14px;
+  }
+
+  .results-body {
+    padding: 32px 40px;
+  }
+
+  .results-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+
+  .result-stat {
+    text-align: center;
+    padding: 16px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+  }
+
+  .result-stat-num {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .result-stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+  }
+
+  .result-stat.correct .result-stat-num { color: var(--success); }
+  .result-stat.wrong .result-stat-num { color: var(--danger); }
+  .result-stat.skipped .result-stat-num { color: var(--warning); }
+  .result-stat.time .result-stat-num { color: var(--aws-navy); font-size: 18px; padding-top: 4px; }
+
+  .results-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+  }
+
+  .results-actions .btn { flex: 1; justify-content: center; }
+
+  /* ===== Explanation Panel ===== */
+  .explanation {
+    margin-top: 24px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid var(--aws-orange);
+    display: none;
+  }
+
+  .explanation.visible { display: block; }
+
+  .explanation h4 {
+    color: var(--aws-navy);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .explanation-content {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre-wrap;
+  }
+
+  .correct-answer-line {
+    background: var(--success-bg);
+    border-left: 3px solid var(--success);
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-size: 13px;
+    border-radius: 2px;
+  }
+
+  /* ===== Modal ===== */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    padding: 20px;
+  }
+
+  .modal-overlay.visible { display: flex; }
+
+  .modal {
+    background: white;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+
+  .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    background: var(--aws-navy);
+    color: white;
+  }
+
+  .modal-header h3 {
+    font-size: 16px;
+    margin: 0;
+  }
+
+  .modal-body {
+    padding: 24px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+  }
+
+  .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    background: #fafafa;
+  }
+
+  .summary-list {
+    margin-top: 16px;
+    font-size: 13px;
+  }
+
+  .summary-list-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .summary-list-item:last-child { border-bottom: none; }
+
+  /* ===== K21 Branding ===== */
+  .k21-header {
+    background: white;
+    border-bottom: 2px solid #4caf50;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+  }
+
+  .k21-brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .k21-logo {
+    height: 48px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  .k21-tagline {
+    line-height: 1.2;
+  }
+
+  .k21-tagline .title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #2c5f2d;
+    letter-spacing: -0.3px;
+  }
+
+  .k21-tagline .sub {
+    font-size: 11px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .exam-name-pill {
+    background: linear-gradient(135deg, #232f3e 0%, #1a232f 100%);
+    color: white;
+    padding: 8px 18px;
+    border-radius: 24px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(35,47,62,0.2);
+  }
+
+  .exam-name-pill .code {
+    background: var(--aws-orange);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  /* ===== Study Notes Screen ===== */
+  .study-notes-screen {
+    max-width: 1100px;
+    margin: 20px auto;
+    padding: 0 20px;
+  }
+
+  .notes-hero {
+    background: linear-gradient(135deg, #2c5f2d 0%, #1d8102 100%);
+    color: white;
+    padding: 40px;
+    border-radius: 8px 8px 0 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .notes-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(255,153,0,0.2) 0%, transparent 70%);
+  }
+
+  .notes-hero h2 {
+    font-size: 28px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  .notes-hero p {
+    font-size: 14px;
+    opacity: 0.9;
+    position: relative;
+  }
+
+  .notes-toolbar {
+    background: white;
+    padding: 16px 24px;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+  }
+
+  .filter-tabs {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .filter-tab {
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    background: white;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: all 0.15s;
+  }
+
+  .filter-tab:hover {
+    border-color: var(--aws-orange);
+    color: var(--aws-orange);
+  }
+
+  .filter-tab.active {
+    background: var(--aws-navy);
+    color: white;
+    border-color: var(--aws-navy);
+  }
+
+  .notes-search {
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    font-size: 13px;
+    width: 240px;
+    outline: none;
+    transition: all 0.15s;
+  }
+
+  .notes-search:focus {
+    border-color: var(--aws-orange);
+    box-shadow: 0 0 0 3px rgba(255,153,0,0.15);
+  }
+
+  .notes-body {
+    background: white;
+    border: 1px solid var(--border);
+    border-top: none;
+    padding: 24px;
+  }
+
+  .note-card {
+    background: #fafbfc;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: all 0.2s;
+  }
+
+  .note-card.hidden-card { display: none; }
+
+  .note-card:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
+  }
+
+  .note-card-header {
+    background: white;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .note-num-badge {
+    background: var(--aws-navy);
+    color: white;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .note-q-text {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text);
+    padding-top: 6px;
+  }
+
+  .note-type-tag {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    align-self: flex-start;
+    margin-top: 8px;
+  }
+
+  .note-type-tag.single { background: #e8f1fa; color: #2563a8; }
+  .note-type-tag.multi { background: #fff4e6; color: #b7740a; }
+
+  .note-card-body {
+    padding: 18px 20px 20px 68px;
+  }
+
+  .note-section {
+    margin-bottom: 16px;
+  }
+
+  .note-section:last-child { margin-bottom: 0; }
+
+  .note-section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .answer-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--success-bg);
+    border: 1px solid var(--success);
+    color: var(--success);
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+
+  .answer-pill .letter {
+    background: var(--success);
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .why-box {
+    background: white;
+    border-left: 3px solid var(--aws-orange);
+    padding: 12px 14px;
+    border-radius: 0 4px 4px 0;
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--text);
+    white-space: pre-wrap;
+  }
+
+  .tip-box {
+    background: #fff8e7;
+    border-left: 3px solid var(--warning);
+    padding: 12px 14px;
+    border-radius: 0 4px 4px 0;
+    font-size: 13px;
+    line-height: 1.7;
+    color: #6b4500;
+  }
+
+  .tip-box strong { color: var(--warning); }
+
+  /* ===== Topic Index ===== */
+  .topic-index {
+    background: linear-gradient(135deg, #fff8e7 0%, #fff 100%);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+
+  .topic-index h3 {
+    color: var(--aws-navy);
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .topic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+  }
+
+  .topic-chip {
+    background: white;
+    border: 1px solid var(--border);
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .topic-chip:hover {
+    border-color: var(--aws-orange);
+    background: #fff9f0;
+    transform: translateY(-1px);
+  }
+
+  .topic-chip .name {
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .topic-chip .count {
+    background: var(--aws-navy);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .study-notes-screen .notes-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .study-notes-screen .notes-actions .btn { flex: 1; justify-content: center; }
+
+  /* Print styles for study notes */
+  @media print {
+    .exam-header, .k21-header, .notes-toolbar, .notes-actions, .filter-tabs, .notes-search {
+      display: none !important;
+    }
+    .note-card { break-inside: avoid; box-shadow: none; }
+    body { background: white; }
+  }
+
+  .hidden { display: none !important; }
+
+  @media (max-width: 900px) {
+    .exam-container {
+      grid-template-columns: 1fr;
+    }
+    .navigator {
+      position: static;
+      max-height: none;
+    }
+    .navigator-grid {
+      grid-template-columns: repeat(10, 1fr);
+    }
+    .header-left .exam-title { display: none; }
+    .question-body { padding: 20px; }
+    .question-footer { padding: 14px 20px; flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== K21 BRANDING BAR (visible on all screens) ===== -->
+<div class="k21-header" id="k21Header">
+  <div class="k21-brand">
+    <img src="data:image/jpeg;base64,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" alt="K21 Academy" class="k21-logo">
+    <div class="k21-tagline">
+      <div class="title">K21 Academy</div>
+      <div class="sub">Learn Cloud, Data & AI from Experts</div>
+    </div>
+  </div>
+  <div class="exam-name-pill">
+    <span class="code">CLF-C02</span>
+    <span>AWS Certified Cloud Practitioner · Practice Test 1</span>
+  </div>
+</div>
+
+<!-- ===== START SCREEN ===== -->
+<div id="startScreen" class="start-screen">
+  <div class="start-card">
+    <div class="start-header">
+      <div class="cert-badge">CLF-C02</div>
+      <h1>AWS Certified Cloud Practitioner</h1>
+      <p>Practice Test 1 — Exam Simulator by K21 Academy</p>
+    </div>
+    <div class="start-body">
+      <div class="exam-info-grid">
+        <div class="info-tile">
+          <div class="info-tile-label">Questions</div>
+          <div class="info-tile-value">65</div>
+        </div>
+        <div class="info-tile">
+          <div class="info-tile-label">Time Limit</div>
+          <div class="info-tile-value">90 min</div>
+        </div>
+        <div class="info-tile">
+          <div class="info-tile-label">Passing Score</div>
+          <div class="info-tile-value">70%</div>
+        </div>
+        <div class="info-tile">
+          <div class="info-tile-label">Question Types</div>
+          <div class="info-tile-value">MCQ / MRQ</div>
+        </div>
+      </div>
+
+      <div class="instructions">
+        <h3>Exam Instructions</h3>
+        <ul>
+          <li>Read each question carefully before selecting your answer</li>
+          <li>Questions marked "Select TWO" require exactly two selections</li>
+          <li>You can mark questions for review and return to them later</li>
+          <li>Use the navigator panel to jump between questions</li>
+          <li>The exam auto-submits when the timer reaches zero</li>
+          <li>You can submit early via the "End Exam" button</li>
+          <li>Detailed explanations are revealed only after submission</li>
+        </ul>
+      </div>
+
+      <button class="start-btn" onclick="startExam()">▶  Start Exam</button>
+      <button class="btn btn-secondary" style="width:100%;margin-top:10px;justify-content:center;padding:14px;" onclick="showStudyNotes()">📚 Browse Study Notes First</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== STUDY NOTES SCREEN ===== -->
+<div id="studyNotesScreen" class="study-notes-screen hidden">
+  <div class="notes-hero">
+    <h2>📚 Study Notes & Answer Key</h2>
+    <p>All 65 questions · Correct answers · Why it's right · Tips to remember</p>
+  </div>
+
+  <div class="notes-toolbar">
+    <div class="filter-tabs" id="filterTabs">
+      <button class="filter-tab active" data-filter="all">All (65)</button>
+      <button class="filter-tab" data-filter="wrong">My Wrong</button>
+      <button class="filter-tab" data-filter="skipped">My Skipped</button>
+      <button class="filter-tab" data-filter="multi">Multi-Select</button>
+    </div>
+    <input type="text" class="notes-search" id="notesSearch" placeholder="🔍 Search by keyword (S3, IAM, RDS...)">
+  </div>
+
+  <div class="notes-body">
+    <div class="topic-index">
+      <h3>🎯 Topic Coverage Map</h3>
+      <div class="topic-grid" id="topicGrid"></div>
+    </div>
+
+    <div id="notesList"></div>
+
+    <div class="notes-actions">
+      <button class="btn btn-primary" onclick="window.print()">🖨 Print / Save as PDF</button>
+      <button class="btn btn-secondary" onclick="backFromNotes()">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== EXAM SCREEN ===== -->
+<div id="examScreen" class="hidden">
+  <header class="exam-header">
+    <div class="header-left">
+      <div class="aws-logo">AWS<span> Cloud Practitioner</span></div>
+      <div class="exam-title">CLF-C02 · Practice Test 1 · K21 Academy</div>
+    </div>
+    <div class="header-right">
+      <div class="progress-info" id="progressInfo">Question 1 of 65</div>
+      <div class="timer" id="timer">90:00</div>
+      <button class="btn btn-danger" onclick="confirmEnd()">End Exam</button>
+    </div>
+  </header>
+
+  <div class="exam-container">
+    <main class="question-panel">
+      <div class="question-meta">
+        <span class="question-number" id="questionNumber">Question 1</span>
+        <div class="question-actions">
+          <button class="btn-review" id="reviewBtn" onclick="toggleReview()">
+            <span id="reviewIcon">☆</span>
+            <span id="reviewText">Mark for Review</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="question-body">
+        <div class="question-text" id="questionText"></div>
+        <div class="multi-select-hint hidden" id="multiHint">
+          ⚠ This is a multiple-response question. Select <strong>exactly TWO</strong> answers.
+        </div>
+        <ul class="options-list" id="optionsList"></ul>
+        <div class="explanation" id="explanation">
+          <h4>📖 Explanation</h4>
+          <div class="explanation-content" id="explanationContent"></div>
+        </div>
+      </div>
+
+      <div class="question-footer">
+        <button class="btn btn-secondary" id="prevBtn" onclick="prevQuestion()">← Previous</button>
+        <button class="btn btn-secondary" onclick="clearAnswer()">Clear Selection</button>
+        <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">Next →</button>
+      </div>
+    </main>
+
+    <aside class="navigator">
+      <div class="navigator-title">Question Navigator</div>
+      <div class="navigator-grid" id="navGrid"></div>
+
+      <div class="legend">
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:#fff;"></div>
+          <span>Not Answered</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:var(--aws-navy);border-color:var(--aws-navy);"></div>
+          <span>Answered</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:var(--review);border-color:var(--review);"></div>
+          <span>Marked for Review</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-swatch" style="background:var(--aws-orange);border-color:var(--aws-orange);"></div>
+          <span>Current</span>
+        </div>
+      </div>
+
+      <div class="stats-box">
+        <div class="stat-row"><span>Answered</span><strong id="statAnswered">0</strong></div>
+        <div class="stat-row"><span>Unanswered</span><strong id="statUnanswered">65</strong></div>
+        <div class="stat-row"><span>For Review</span><strong id="statReview">0</strong></div>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<!-- ===== RESULTS SCREEN ===== -->
+<div id="resultsScreen" class="results-screen hidden">
+  <div class="results-card">
+    <div class="results-header" id="resultsHeader">
+      <div class="score-circle">
+        <div class="score-value" id="scoreValue">0%</div>
+        <div class="score-label">Score</div>
+      </div>
+      <div class="results-verdict" id="resultsVerdict">Result</div>
+      <div class="results-subtext" id="resultsSubtext"></div>
+    </div>
+    <div class="results-body">
+      <div class="results-stats">
+        <div class="result-stat correct">
+          <div class="result-stat-num" id="statCorrect">0</div>
+          <div class="result-stat-label">Correct</div>
+        </div>
+        <div class="result-stat wrong">
+          <div class="result-stat-num" id="statWrong">0</div>
+          <div class="result-stat-label">Incorrect</div>
+        </div>
+        <div class="result-stat skipped">
+          <div class="result-stat-num" id="statSkipped">0</div>
+          <div class="result-stat-label">Skipped</div>
+        </div>
+        <div class="result-stat time">
+          <div class="result-stat-num" id="statTime">--:--</div>
+          <div class="result-stat-label">Time Used</div>
+        </div>
+      </div>
+
+      <div class="results-actions">
+        <button class="btn btn-primary" onclick="showStudyNotes()">📚 View Study Notes</button>
+        <button class="btn btn-secondary" onclick="reviewAnswers()">📝 Review Answers</button>
+        <button class="btn btn-secondary" onclick="restartExam()">🔄 Retake</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== MODAL ===== -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Submit Exam?</h3>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-danger" onclick="submitExam()">Submit Exam</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// QUESTION DATA
+// ============================================================
+const QUESTIONS = [
+  {q:"A company is using Amazon S3 to store their static media contents such as photos and videos. Which of the following should you use to provide specific users access to the bucket?",
+   opts:["SSH key","Security Group","Bucket Policy","Network Access Control List"],
+   correct:[2],
+   exp:"Bucket policy and user policy are two access policy options to grant permission to your Amazon S3 resources. Both use JSON-based access policy language. For your bucket, you add a bucket policy to grant other AWS accounts or IAM users permissions for the bucket and the objects in it.\n\n• Security Group → virtual firewall for EC2 (not S3)\n• SSH key → for SSH access to EC2 instances\n• Network ACL → optional layer of security for VPC subnets"},
+
+  {q:"Which of the following AWS Global Infrastructure components is made up of one or more discrete data centers, each with redundant power, networking, and connectivity and housed in separate facilities?",
+   opts:["Edge location","AWS Region","VPC","Availability Zone"],
+   correct:[3],
+   exp:"Availability Zones consist of one or more discrete data centers, each with redundant power, networking, and connectivity, housed in separate facilities. Each AZ is designed as an independent failure zone, physically separated within a typical metropolitan region.\n\n• Edge location → CloudFront caching site\n• AWS Region → consists of multiple AZs\n• VPC → logically isolated section of AWS Cloud"},
+
+  {q:"What are the benefits of using Edge locations in AWS? (Select TWO.)",
+   opts:["Offers an easy-to-use edge computing device that is helpful for data migration","Seamlessly extends AWS to edge devices so they can act locally on the data they generate, while still using the cloud for management, analytics, and durable storage","Provides caching which reduces the load on your origin servers","Improves application performance by delivering content closer to your users","Provides highly scalable object storage for your static content"],
+   correct:[2,3],
+   exp:"CloudFront delivers content through a worldwide network of edge locations. When a user requests content, they're routed to the edge location providing the lowest latency. Edge locations cache copies of content, reducing load on origin servers and delivering content closer to users.\n\n• Edge computing device for migration → describes AWS Snowball Edge\n• Extending AWS to edge devices → describes AWS IoT Greengrass\n• Highly scalable object storage → describes Amazon S3"},
+
+  {q:"Which of the following are true regarding Amazon Relational Database Service (Amazon RDS)? (Select TWO.)",
+   opts:["Simplifies the management of time-consuming database administration tasks","It is a fully managed nonrelational database service","Provides 99.99999999999% reliability and durability","Automatically scales up the relational database instance size based on the incoming workload","Makes it easy to set up, operate, and scale a relational database"],
+   correct:[0,4],
+   exp:"Amazon RDS makes it easy to set up, operate, and scale a relational database in the cloud. It automates time-consuming administration tasks such as hardware provisioning, database setup, patching, and backups.\n\n• 99.999999999% durability → refers to Amazon S3\n• Auto-scales instance size → RDS does NOT auto-scale instance size (only storage with auto-scaling enabled)\n• Nonrelational → refers to DynamoDB"},
+
+  {q:"Which Amazon EC2 instance purchasing option lets you take advantage of unused EC2 capacity in the AWS Cloud and provides up to a 90% discount compared to On-Demand prices?",
+   opts:["Dedicated Host","Standard Reserved Instance","Spot Instance","Convertible Reserved Instance"],
+   correct:[2],
+   exp:"Spot Instances let you take advantage of unused EC2 capacity at up to 90% discount compared to On-Demand. Suitable for stateless, fault-tolerant, or flexible applications like big data, CI/CD, web servers, and HPC workloads.\n\n• Standard RI → up to 75% off (not 90%)\n• Convertible RI → up to 54% off\n• Dedicated Host → physical server dedicated to your use"},
+
+  {q:"A startup is developing a mobile app with a database service to store user data. The app is expected to grow rapidly, and the company needs a flexible and scalable database service that can handle unpredictable traffic and workload spikes. Which service should the startup use if they need a scalable, fast, and flexible non-relational database service?",
+   opts:["Amazon RDS","Amazon Redshift","Amazon S3","Amazon DynamoDB"],
+   correct:[3],
+   exp:"Amazon DynamoDB is a fully managed NoSQL database service that provides fast and predictable performance with seamless scalability. It handles administrative burdens of operating and scaling a distributed database.\n\n• Redshift → data warehousing for OLAP/BI\n• RDS → relational database service\n• S3 → object storage, not a database"},
+
+  {q:"Which among the options below can you use to launch a new Amazon RDS database cluster to your VPC? (Select TWO.)",
+   opts:["AWS Concierge","AWS CloudFormation","AWS Management Console","AWS Systems Manager","AWS CodePipeline"],
+   correct:[1,2],
+   exp:"You can launch a new RDS database cluster using the AWS Management Console, AWS CLI, AWS SDK, and AWS CloudFormation.\n\n• AWS Concierge → senior customer service agent for Enterprise Support\n• AWS CodePipeline → continuous delivery service\n• AWS Systems Manager → unified operational interface"},
+
+  {q:"Which of the following IAM identities is associated with the access keys that are used in managing your cloud resources via the AWS Command Line Interface (AWS CLI)?",
+   opts:["IAM Policy","IAM User","IAM Role","IAM Group"],
+   correct:[1],
+   exp:"Access keys are long-term credentials for an IAM user or root user. An IAM user consists of a name, password for console sign-in, and up to two access keys for API/CLI use.\n\n• IAM Role → uses temporary credentials, not long-term access keys\n• IAM Group → collection of users, not used for CLI\n• IAM Policy → not an identity"},
+
+  {q:"Which of the following can you use to resolve the connection between your on-premises VPN and your Amazon VPC (Amazon Virtual Private Cloud)? (Select TWO.)",
+   opts:["Amazon Route 53","Egress-Only Internet Gateway","NAT Gateway","VPC Peering","Virtual Private Gateway"],
+   correct:[0,4],
+   exp:"A Virtual Private Gateway is the anchor on the AWS side of a Site-to-Site VPN connection. Amazon Route 53 Resolver provides recursive DNS for your VPC and on-premises networks over AWS Direct Connect or VPN.\n\n• NAT Gateway → outbound internet from private subnets\n• Egress-Only IGW → IPv6 outbound only\n• VPC Peering → connects two VPCs, not on-premises"},
+
+  {q:"A group of Software Engineers is working on a project that requires a new Microsoft SQL Server database to be hosted in AWS. Which of the following AWS services should they use to meet their requirement? (Select TWO.)",
+   opts:["Amazon Aurora Backtrack","Amazon Aurora","Amazon EC2","Amazon Relational Database Service (Amazon RDS)","Amazon Redshift"],
+   correct:[2,3],
+   exp:"SQL Server on Amazon EC2 gives complete control over every setting. Amazon RDS is a managed service that handles maintenance, backups, and patching for SQL Server.\n\n• Aurora → MySQL/PostgreSQL compatible, not SQL Server\n• Redshift → data warehousing\n• Aurora Backtrack → feature for restoring Aurora clusters"},
+
+  {q:"Which of the following Cost Management Tools allows you to track your Amazon EC2 Reserved Instance (RI) usage and view the discounted RI rate that was charged to your resources?",
+   opts:["AWS Price List Bulk API","AWS Cost Explorer","AWS Cost and Usage report","AWS Budgets"],
+   correct:[2],
+   exp:"The AWS Cost and Usage Report is the one-stop shop for the most granular AWS cost and usage data. Each line item that receives an RI discount contains info about where the discount was allocated.\n\n• Price List Bulk API → up-to-date pricing info\n• Cost Explorer → visualize costs (less granular)\n• Budgets → set custom budget alerts"},
+
+  {q:"For security audit purposes, a company needs to download compliance-related documents in AWS such as ISO certifications, Payment Card Industry (PCI), and Service Organization Control (SOC) reports. Where can they retrieve these files?",
+   opts:["AWS Artifact","AWS Certificate Manager","AWS Trusted Advisor","AWS CloudTrail"],
+   correct:[0],
+   exp:"AWS Artifact is the central resource for compliance-related information. It provides on-demand access to security and compliance reports including SOC, PCI, ISO certifications, and select online agreements like BAA and NDA.\n\n• Trusted Advisor → best practice recommendations\n• Certificate Manager → SSL/TLS certs\n• CloudTrail → API audit logging"},
+
+  {q:"Which statement below is correct regarding the components of the AWS Global Infrastructure?",
+   opts:["An edge location contains multiple AWS Regions.","An Availability Zone contains edge locations.","An AWS Region contains multiple Availability Zones.","An Availability Zone contains multiple AWS Regions."],
+   correct:[2],
+   exp:"AWS Regions consist of multiple Availability Zones, each of which is a fully isolated partition of AWS infrastructure consisting of discrete data centers with redundant power, networking, and connectivity."},
+
+  {q:"Which two services are used for VPC security and can be found in the VPC dashboard in the AWS Console? (Select TWO.)",
+   opts:["Security Groups","Route 53","Network ACLs","CloudFront","Lambda"],
+   correct:[0,2],
+   exp:"In your VPC dashboard, you manage Subnets, Internet Gateways, NAT Gateways, Elastic IPs, and security through Network ACLs and Security Groups.\n\n• Route 53, CloudFront, and Lambda have their own dashboards"},
+
+  {q:"Which of the following allows you to categorize and track your AWS costs on a detailed level?",
+   opts:["Cost allocation tags","Amazon Aurora Backtrack","Consolidated Billing","AWS Budgets"],
+   correct:[0],
+   exp:"Cost allocation tags help organize resource costs on your cost allocation report. AWS provides AWS-generated tags and user-defined tags. Both types must be activated separately before appearing in Cost Explorer.\n\n• Consolidated Billing → multi-account billing\n• Budgets → custom budget alerts\n• Aurora Backtrack → DB cluster rewind feature"},
+
+  {q:"What are the things that you can implement to improve the security of your Identity and Access Management (IAM) users? (Select TWO.)",
+   opts:["Block incoming traffic via Network ACL.","Block incoming traffic via Security Groups.","Enable Multi-Factor Authentication (MFA).","Enable AWS Mobile Push Notification.","Configure a strong password policy for your users."],
+   correct:[2,4],
+   exp:"IAM best practices include: rotating credentials regularly, configuring strong password policies (minimum length, character requirements, rotation frequency), and enabling MFA for all users.\n\n• Network ACL / Security Groups → VPC networking, not IAM\n• Mobile Push Notification → SNS feature, not IAM"},
+
+  {q:"In the Shared Responsibility Model, which of the following options below is a shared control between AWS and the customer?",
+   opts:["Server-side data encryption","Client-side data encryption","Awareness and training","Physical and environmental controls of the AWS data centers"],
+   correct:[2],
+   exp:"Shared Controls apply to both infrastructure layer and customer layers in separate contexts. Examples: Patch Management, Configuration Management, and Awareness & Training (AWS trains AWS employees; customer trains their own).\n\n• Client/Server-side encryption → customer responsibility\n• Physical controls → AWS responsibility"},
+
+  {q:"A customer is planning to migrate some of their web applications that are hosted on-premises to AWS. Which of the following is a benefit of using AWS over virtualized data centers?",
+   opts:["Higher variable costs and higher upfront costs.","Lower variable costs and higher upfront costs.","Lower variable costs and lower upfront costs.","Higher variable costs and lower upfront costs."],
+   correct:[2],
+   exp:"AWS helps customers replace upfront capital infrastructure expenses with low variable costs that scale with your business. Both upfront AND variable costs are reduced compared to on-premises."},
+
+  {q:"Which of the following allows you to set coverage targets and receive alerts when your utilization drops below the threshold you define?",
+   opts:["AWS Cost Explorer","Amazon CloudWatch Billing Alarm","AWS Budgets","AWS Trusted Advisor"],
+   correct:[2],
+   exp:"AWS Budgets lets you set reservation utilization or coverage targets and receive alerts when utilization drops below your defined threshold. Supported for EC2, RDS, Redshift, ElastiCache, and OpenSearch reservations.\n\n• Cost Explorer → visualize costs (no thresholds)\n• Trusted Advisor → best practice recommendations\n• CloudWatch Billing Alarm → estimated charges monitoring"},
+
+  {q:"There is a requirement to launch a new database in AWS where the customer assumes the responsibility and management of the guest operating system, including updates and security patches. Which of the following services should the customer use?",
+   opts:["Amazon Aurora","Amazon DynamoDB","Amazon DocumentDB","Amazon EC2"],
+   correct:[3],
+   exp:"Amazon EC2 gives you control over the instance, allowing you to install any database and manage its guest OS, updates, and patches. The other options are fully managed services where AWS handles the OS.\n\n• Aurora, DynamoDB, DocumentDB → all fully managed (no OS access)"},
+
+  {q:"Which type of Elastic Load Balancer supports path-based routing, host-based routing, and bi-directional communication channels using WebSockets?",
+   opts:["Classic Load Balancer","Both Application Load Balancer and Network Load Balancer","Application Load Balancer","Network Load Balancer"],
+   correct:[2],
+   exp:"Application Load Balancers (Layer 7) support path-based routing, host-based routing, WebSockets, and containerized applications. Configure listener rules to forward requests based on URL path or host header.\n\n• Network LB → Layer 4, no path/host routing\n• Classic LB → basic, legacy EC2-Classic"},
+
+  {q:"Which AWS services should you use to store rapidly changing data and has low read and write latencies? (Select TWO.)",
+   opts:["Amazon AppStream 2.0","Amazon RDS","Amazon S3","AWS Snowball","Amazon EBS"],
+   correct:[1,4],
+   exp:"Rapidly changing data is better served by storage solutions with lower read/write latencies, such as Amazon EBS volumes, Amazon RDS, or DynamoDB. S3 is optimal for relatively static data.\n\n• S3 → static content, not rapidly changing\n• Snowball → data migration appliance\n• AppStream → application streaming"},
+
+  {q:"Which of the following best describes what CloudWatch can be used for?",
+   opts:["An automated security assessment service","An audit service that records all API calls made in your AWS account","A repository for metrics and logs","A repository for compliance rules"],
+   correct:[2],
+   exp:"Amazon CloudWatch is a metrics and logs repository. AWS services put metrics and monitoring logs into CloudWatch, where you can view statistics, set alarms, and trigger automated actions.\n\n• API call audit → CloudTrail\n• Compliance rules → AWS Config\n• Security assessment → Amazon Inspector"},
+
+  {q:"Which of the following is true on how AWS lessens the time to provision your IT resources?",
+   opts:["It provides an AI-powered IT ticketing platform for fulfilling resource requests.","It provides express service to deliver your servers to your data centers fast.","It provides various ways to programmatically provision IT resources.","It provides an automated system of requesting and fulfilling IT resources from third-party vendors."],
+   correct:[2],
+   exp:"AWS provides various ways and tools to programmatically provision IT resources, such as AWS CLI, AWS API, and the web-based AWS Management Console. Cloud computing eliminates large upfront investments and reduces provisioning time from weeks/months to minutes."},
+
+  {q:"Which of the following are regarded as regional services in AWS? (Select TWO.)",
+   opts:["Amazon Route 53","Amazon EFS","AWS Security Token Service","Amazon EC2","AWS Batch"],
+   correct:[1,4],
+   exp:"Regional services include Amazon EFS and AWS Batch. \n\n• Global services: IAM, STS, Route 53, CloudFront, WAF\n• Zonal services: EC2 instances, EBS Volumes (tied to AZ)\n• Most other services are regional"},
+
+  {q:"Users from different parts of the globe are complaining about the slow performance of the newly launched photo-sharing website in loading their high-resolution images. Which combination of AWS services should you use to serve the files with lowest possible latency? (Select TWO.)",
+   opts:["AWS Storage Gateway","Amazon CloudFront","Amazon Glacier","Amazon S3","Amazon Elastic File System"],
+   correct:[1,3],
+   exp:"Store static content (images, videos) in Amazon S3 and deliver via Amazon CloudFront, which caches content at edge locations globally for low-latency delivery.\n\n• Storage Gateway → hybrid cloud storage\n• EFS → file system (can't connect to CloudFront directly)\n• Glacier → archival storage"},
+
+  {q:"A company is in the process of choosing the most suitable AWS Region to migrate its applications. Which of the following factors should they consider? (Select TWO.)",
+   opts:["Availability Zone Security.","Potential volume discounts for the specific AWS Region.","Proximity to your end-users for on-site visits to your on-premises data center.","Enhance customer experiences by reducing latency to users.","Support country-specific data sovereignty compliance requirements."],
+   correct:[3,4],
+   exp:"Key factors when choosing an AWS Region: proximity to end-users (reduce latency), data sovereignty/compliance requirements, service availability, and pricing.\n\n• On-site visits → AWS Region is separate from on-prem\n• Volume discounts → from AWS Organizations\n• AZ Security → customer-specific control"},
+
+  {q:"Which of the following services is capable of inspecting your AWS environment and making recommendations to lower expenditures, improve system performance and reliability, and close security gaps?",
+   opts:["AWS Inspector","AWS Cost Explorer","AWS Budgets","AWS Trusted Advisor"],
+   correct:[3],
+   exp:"AWS Trusted Advisor provides real-time guidance to provision resources following AWS best practices across 5 categories: Cost Optimization, Security, Fault Tolerance, Performance, and Service Limits.\n\n• Inspector → security assessment for apps\n• Cost Explorer → cost visualization\n• Budgets → spending alerts"},
+
+  {q:"What is the minimum number of Availability Zones that you should set up for your Application Load Balancer in order to create a highly available architecture?",
+   opts:["4","1","2","3"],
+   correct:[2],
+   exp:"An Application Load Balancer requires at least 2 Availability Zones to create a highly available architecture. If one AZ experiences an outage, traffic routes to the other AZ."},
+
+  {q:"Which of the following is a key use case of AWS Control Tower?",
+   opts:["A way for customers to send instructions to an AWS account on how to deploy popular technologies such as WordPress.","A fast monitoring engine used to detect if any of your AWS accounts deviate from the AWS best practices.","An easy way to establish a landing zone that implements an AWS well-architected, multi-account environment and applies the AWS best practices.","A centralized logging service for all types of log files."],
+   correct:[2],
+   exp:"AWS Control Tower offers the easiest way to set up and govern a secure, multi-account AWS environment. It establishes a landing zone based on best-practices blueprints and enables governance using guardrails.\n\n• WordPress deployment → AWS Quick Starts\n• Best practice monitoring → Trusted Advisor / Config\n• Centralized logging → CloudWatch Logs"},
+
+  {q:"A company which has a basic support plan needs resources to deploy, test, and improve their AWS environment. Which of the following can they use for free?",
+   opts:["AWS online documentation, whitepapers, blogs and support forums","Technical Account Manager consultation","AWS Support API for programmatic case management","In-person classes with an accredited AWS instructor"],
+   correct:[0],
+   exp:"Basic Support (free) includes: Customer service, support forums, service health checks, documentation, whitepapers, and best-practice guides.\n\n• Support API → Business or Enterprise plan\n• TAM consultation → Enterprise plan only\n• In-person training → paid"},
+
+  {q:"Which of the following is true regarding the Developer support plan in AWS? (Select TWO.)",
+   opts:["Recommended if you have business and/or mission critical workloads in AWS","Limited access to the 7 Core Trusted Advisor checks","No access to the AWS Support API","Has access to the full set of Trusted Advisor checks","Full access to the AWS Support API"],
+   correct:[1,2],
+   exp:"Developer support plan: recommended for experimenting/testing, limited access to 7 Core Trusted Advisor checks, NO access to AWS Support API.\n\n• Business-critical workloads → Business/Enterprise plan\n• Full Trusted Advisor → Business/Enterprise plan\n• Support API → Business/Enterprise plan"},
+
+  {q:"Which of the following provides you the most granular data about your AWS costs and usage and also load that information into Amazon Athena, Amazon Redshift, AWS QuickSight, or a tool of your choice?",
+   opts:["Consolidated Billing","AWS Budgets","AWS Cost and Usage Reports","AWS Cost Explorer"],
+   correct:[2],
+   exp:"AWS Cost and Usage Reports provide the most granular cost and usage data. You can load the info into Athena, Redshift, QuickSight, or other tools. Lists usage per service category in hourly or daily line items."},
+
+  {q:"A company has enlisted the help of TDojo Consulting Co. to assist them in designing an AWS disaster recovery solution for their on-premises bare metal servers and SQL databases. Which tool should the team adopt for the DR solution?",
+   opts:["AWS Application Migration Service","AWS Migration Hub","AWS Elastic Disaster Recovery","AWS Database Migration Service","High Availability"],
+   correct:[2],
+   exp:"AWS Elastic Disaster Recovery (AWS DRS) minimizes downtime and data loss with fast, reliable recovery of on-premises and cloud-based applications using affordable storage, minimal compute, and point-in-time recovery.\n\n• Application Migration Service → app migration, not DR\n• DMS → database migration\n• Migration Hub → monitor migrations"},
+
+  {q:"Which service provides event history of your AWS account activity, including actions taken through the AWS Management Console, AWS SDKs, command line tools, and other AWS services?",
+   opts:["Amazon CloudWatch","AWS CloudTrail","AWS Infrastructure Event Management","AWS Config"],
+   correct:[1],
+   exp:"AWS CloudTrail enables governance, compliance, operational auditing, and risk auditing. It records account activity including actions via Console, SDKs, CLI, and other AWS services.\n\n• CloudWatch → metrics and logs\n• Config → resource configuration tracking\n• Infrastructure Event Management → planning support for events"},
+
+  {q:"A company is currently using an On-Demand EC2 instance for their application which they plan to migrate to a Reserved EC2 Instance to save on cost. Which of the following is the most cost-effective option if the application being hosted would be used for more than 3 years?",
+   opts:["All Upfront Convertible Reserved Instance pricing for a 1-year term.","No Upfront Convertible Reserved Instance pricing for a 3-year term.","No Upfront Standard Reserved Instance pricing for a 1-year term that is renewed every year.","All Upfront, Standard Reserved Instance pricing for a 3-year term."],
+   correct:[3],
+   exp:"Most cost-effective combination:\n• Standard RI > Convertible RI (more savings)\n• All Upfront > Partial > No Upfront (largest discount)\n• 3-year term > 1-year term (greater discount)\n\nTherefore: All Upfront, Standard RI, 3-year term = maximum savings."},
+
+  {q:"A company is planning to launch a new system in AWS but they do not have an employee who has AWS-related expertise. Which of the following AWS channels can instead help the company design, architect, build, migrate, and manage their workloads and applications on AWS?",
+   opts:["AWS Partner Network Consulting Partners","AWS Partner Network Technology Partners","AWS Marketplace","Technical Account Management"],
+   correct:[0],
+   exp:"APN Consulting Partners are professional services firms (SIs, Consultancies, Resellers, Digital Agencies, MSPs, VARs) that help customers design, architect, migrate, or build new applications on AWS.\n\n• Technology Partners → software solutions (ISVs, SaaS)\n• Marketplace → buy/sell software\n• TAM → part of Enterprise Support"},
+
+  {q:"Which of the following characteristics correctly describes the Amazon Simple Storage Service? (Select TWO.)",
+   opts:["A storage service with virtually unlimited space","A hybrid cloud storage service","A highly durable object storage infrastructure","A high-performance block storage service","A durable, high throughput file system"],
+   correct:[0,2],
+   exp:"Amazon S3 is an object storage service offering industry-leading scalability with virtually unlimited storage. Designed for 99.999999999% (11 9's) of durability.\n\n• File system → EFS\n• Block storage → EBS\n• Hybrid cloud storage → Storage Gateway"},
+
+  {q:"Which AWS service enables you to build event-driven applications and decouple the components of your application architecture?",
+   opts:["Amazon EventBridge","Amazon Kinesis","Amazon SNS","Amazon SQS"],
+   correct:[0],
+   exp:"Amazon EventBridge is a serverless event bus service for event-driven applications. It enables decoupling by connecting various sources and targets (Lambda, SNS, Step Functions) via established routing rules.\n\n• SQS → message queuing\n• SNS → pub/sub messaging\n• Kinesis → real-time data streaming"},
+
+  {q:"Which of the following is the most cost-effective AWS Support Plan to use if you need access to AWS Support API for programmatic case management?",
+   opts:["Enterprise","Developer","Basic","Business"],
+   correct:[3],
+   exp:"AWS Support API access requires Business or Enterprise support plan. Since Business is more affordable than Enterprise, the most cost-effective option is the Business support plan."},
+
+  {q:"In AWS Trusted Advisor, which of the following options are included among the five categories being considered to analyze your AWS environment and provide the best practice recommendations? (Select TWO.)",
+   opts:["Fault Tolerance","Performance","Instance Usage","Storage Capacity","Infrastructure"],
+   correct:[0,1],
+   exp:"The 5 Trusted Advisor categories are:\n1. Cost Optimization\n2. Security\n3. Fault Tolerance\n4. Performance\n5. Service Limits"},
+
+  {q:"Which of the following below are the benefits of using Consolidated billing in AWS? (Select TWO.)",
+   opts:["You get one bill for multiple accounts","Allows one member account to pay the charges of all the master accounts","Consolidated all the bills from multiple AWS accounts for only $1 every month","Share the volume pricing and Reserved Instance discounts by combining the usage across all accounts in the organization","Consolidate together the billing and payment of both AWS accounts and Amazon Internet Services Pvt. Ltd (AISPL) accounts"],
+   correct:[0,3],
+   exp:"Consolidated Billing benefits:\n• One bill for multiple accounts\n• Easy tracking across accounts\n• Combined usage for volume pricing/RI discounts\n• No extra fee (free)\n\nNote: Master account pays for members (not reverse). AWS and AISPL accounts CANNOT be consolidated together."},
+
+  {q:"Which AWS service allows your EC2 compute capacity to automatically scale based on the incoming traffic?",
+   opts:["AWS Auto Scaling","Amazon Macie","AWS CloudTrail","Amazon Lightsail"],
+   correct:[0],
+   exp:"AWS Auto Scaling configures automatic scaling for AWS resources. Uses scaling plans with dynamic and predictive scaling to optimize for availability, cost, or balance.\n\n• Macie → data security/discovery\n• CloudTrail → API auditing\n• Lightsail → VPS solution"},
+
+  {q:"A company has web servers running on Amazon EC2 instances that access a RESTful API hosted on their on-premises data center. What kind of architecture is the company using?",
+   opts:["Software as a Service (SaaS)","Serverless Architecture","Platform as a Service (PaaS)","Hybrid Architecture"],
+   correct:[3],
+   exp:"A hybrid architecture combines cloud resources with on-premises infrastructure. EC2 instances (cloud) accessing an on-premises API is a textbook hybrid setup.\n\n• Serverless → Lambda, no servers managed\n• SaaS/PaaS → cloud computing models, not architectures"},
+
+  {q:"A company is designing a new cloud architecture for its mission-critical application in AWS which must be highly-available. Which of the following is the recommended pattern to meet this requirement?",
+   opts:["Make sure that each component of the application has high bandwidth and low-latency network connectivity using ENIs.","Use multiple Availability Zones to ensure that the application can handle the failure of any single component.","Adopt a monolithic application architecture.","Deploy an Amazon EC2 Spot Fleet with a diversified allocation strategy."],
+   correct:[1],
+   exp:"Use multiple Availability Zones to ensure your application can handle the failure of any single component. AZs are physically separated, providing fault isolation.\n\n• ENIs alone don't provide HA\n• Spot instances can be interrupted\n• Monolithic architecture is obsolete"},
+
+  {q:"How can you apply and easily manage the common access permissions to a large number of IAM users in AWS?",
+   opts:["Apply permissions to multiple IAM Users by using a cross-account role.","Attach the exact same IAM Policy to all of the IAM Users.","Attach the necessary policies or permissions required to a new IAM Group then afterwards, add the IAM Users to the IAM group.","Attach the IAM Policy to an IAM Role then afterwards, associate that role to all of the IAM Users."],
+   correct:[2],
+   exp:"IAM Groups let you specify permissions for multiple users, making management easier. Add a user to the group → user inherits the group's permissions. Remove from group → permissions removed."},
+
+  {q:"Which among the options below is a highly available and scalable cloud Domain Name System (DNS) web service in AWS?",
+   opts:["Route 53","Active Directory Domain Service","Rekognition","Lightsail"],
+   correct:[0],
+   exp:"Amazon Route 53 is a highly available and scalable cloud DNS web service. It translates names like www.example.com into IP addresses, supports IPv6, and offers traffic routing policies (latency, geo, weighted, failover).\n\n• Rekognition → image/video analysis\n• Lightsail → VPS\n• AD DS → Windows directory service"},
+
+  {q:"Which AWS service helps identify resources shared with an external entity and generates policies based on access activity?",
+   opts:["AWS Proton","AWS Systems Manager Parameter Store","AWS IAM Access Analyzer","AWS License Manager"],
+   correct:[2],
+   exp:"AWS IAM Access Analyzer features:\n• Identifies resources shared with external entities\n• Validates IAM policies against grammar and best practices\n• Generates IAM policies based on CloudTrail access activity\n\n• Proton → deployment workflow\n• License Manager → software licenses\n• Parameter Store → configuration data"},
+
+  {q:"An e-commerce company wants to migrate its on-premise infrastructure to Amazon Web Services. However, they are worried about ensuring their migration is secure and efficient. Which of the following AWS Cloud Adoption Framework perspective would be the most essential for the company's migration?",
+   opts:["Governance Perspective","Security Perspective","Operations Perspective","Platform Perspective"],
+   correct:[1],
+   exp:"The Security Perspective ensures the confidentiality, integrity, and availability of cloud workloads and data. It focuses on appropriate security controls to protect infrastructure during migration.\n\nThe 6 CAF perspectives: Business, People, Governance, Platform, Security, Operations."},
+
+  {q:"Which of the following AWS service provides managed compliance and security controls for workloads?",
+   opts:["AWS Lambda","AWS Security Hub","Amazon S3","Amazon EC2"],
+   correct:[1],
+   exp:"AWS Security Hub provides comprehensive view of security and compliance across AWS accounts. Aggregates findings from AWS services and third-party tools. Offers automated compliance checks against PCI DSS, HIPAA, CIS AWS Foundations Benchmark, etc."},
+
+  {q:"Which of the following can a developer use to interact with your AWS services? (Select TWO.)",
+   opts:["AWS Command Line Interface","AWS SDKs","AWS Organizations","Elastic Network Interface","AWS Artifact"],
+   correct:[0,1],
+   exp:"Developers can interact with AWS via:\n• AWS CLI → command-line tool\n• AWS SDKs → language-specific APIs (Python, Java, Node.js, etc.)\n• AWS Management Console → web-based UI\n\n• ENI → virtual network card\n• Organizations → multi-account management\n• Artifact → compliance reports"},
+
+  {q:"You need to launch a new EC2 Instance for a beta program which is scheduled to change its instance family, operating system and tenancy exactly 3 months after its trial period. Which type of Reserved Instance (RI) should you use?",
+   opts:["Zonal RI","Standard RI","Scheduled RI","Convertible RI"],
+   correct:[3],
+   exp:"Convertible RIs can be exchanged during the term for another Convertible RI with new attributes including instance family, instance type, platform, scope, or tenancy. Up to 54% off vs On-Demand.\n\n• Standard RI → can only modify size, AZ, network type (not family/OS/tenancy)\n• Scheduled RI → recurring capacity reservations\n• Zonal RI → specific to AZ"},
+
+  {q:"A company is planning to adopt a hybrid cloud architecture with AWS. Which of the following options can they use to help them estimate their costs?",
+   opts:["Consolidated Billing","Cost allocation tag","AWS Pricing Calculator","AWS Cost Explorer"],
+   correct:[2],
+   exp:"AWS Pricing Calculator is the tool to estimate monthly costs of AWS services based on expected usage. Continuously updated with latest pricing.\n\n• Cost Explorer → forecasts based on PAST usage (can't use if not yet on AWS)\n• Cost allocation tag → categorize existing costs\n• Consolidated Billing → multi-account billing"},
+
+  {q:"Which of the following is a key financial benefit of migrating systems hosted on your on-premises data center to AWS?",
+   opts:["Opportunity to replace variable capital expenses (CAPEX) with low upfront costs.","Opportunity to replace upfront capital expenses (CAPEX) with low variable costs.","Opportunity to replace variable operational expenses (OPEX) with low upfront capital expenses (CAPEX).","Opportunity to replace upfront operational expenses (OPEX) with low variable operational expenses (OPEX)."],
+   correct:[1],
+   exp:"Key cloud financial benefit: replace upfront capital expenses (CAPEX) with low variable costs that scale with your business. Pay-as-you-go pricing eliminates large upfront IT infrastructure investments."},
+
+  {q:"Which of the following Amazon EC2 instance purchasing options can help you address compliance requirements and reduce costs by allowing you to use your existing server-bound software licenses?",
+   opts:["On-Demand Instance","Dedicated Instance","Reserved Instance","Dedicated Host"],
+   correct:[3],
+   exp:"Amazon EC2 Dedicated Hosts allow you to use existing per-socket, per-core, or per-VM software licenses (Windows Server, SQL Server, SUSE, RHEL, etc.). Provides visibility into instance placement on physical servers — key for BYOL (Bring Your Own License) and compliance.\n\n• Dedicated Instance → dedicated HW but no placement control"},
+
+  {q:"What service provides the lowest-cost storage option for retaining database backups which also allows occasional data retrieval in minutes?",
+   opts:["Amazon EBS","Amazon S3 Glacier Flexible Retrieval","Amazon S3","Amazon EFS"],
+   correct:[1],
+   exp:"S3 Glacier Flexible Retrieval is for archiving data that might infrequently need to be restored (once or twice per year) within a few hours OR a few minutes (Expedited retrieval).\n\n• S3 Glacier Instant Retrieval → milliseconds (more expensive)\n• Glacier Deep Archive → 12-48 hour retrieval (cheaper but slower)\n• EBS/EFS → expensive vs Glacier"},
+
+  {q:"In AWS, _______ is one of the advantages of Consolidated Billing.",
+   opts:["Consolidation of both AWS and AISPL accounts into one billing.","Volume pricing.","Go global in minutes.","The ability to have one member account to pay the charges of all the master accounts."],
+   correct:[1],
+   exp:"Volume pricing: AWS combines usage across all accounts to determine which volume pricing tiers to apply, giving a lower overall price. This applies to services like EC2 and S3 that have tiered pricing.\n\nNote: It's the MASTER account that pays for members (not reverse). AWS and AISPL accounts can't be consolidated."},
+
+  {q:"Which AWS service should you use if you need to launch a highly scalable MySQL OLTP database?",
+   opts:["Amazon DynamoDB","Amazon Aurora","Amazon ElastiCache","Amazon Redshift"],
+   correct:[1],
+   exp:"Amazon Aurora is a MySQL and PostgreSQL-compatible relational database. Up to 5x faster than standard MySQL, with auto-scaling storage up to 128TB, 15 low-latency read replicas, and replication across 3 AZs.\n\n• DynamoDB → NoSQL\n• Redshift → OLAP (not OLTP)\n• ElastiCache → in-memory cache"},
+
+  {q:"Among the following services, which is the most suitable one to use to store the results of I/O-intensive SQL database queries to improve application performance?",
+   opts:["Amazon DynamoDB Accelerator (DAX)","Amazon ElastiCache","AWS Greengrass","AWS IoT Greengrass"],
+   correct:[1],
+   exp:"Amazon ElastiCache (Redis/Memcached) provides in-memory caching to improve app performance by storing critical data (like I/O-intensive SQL query results) for low-latency access.\n\n• DAX → caching for DynamoDB only (NoSQL, not SQL)\n• IoT Greengrass → edge computing for IoT devices"},
+
+  {q:"Which of the following channels shares a collection of offerings to help you achieve specific business outcomes related to enterprise cloud adoption through paid engagements in several specialty practice areas?",
+   opts:["AWS Professional Services","AWS Enterprise Support","Concierge Support","AWS Technical Account Manager"],
+   correct:[0],
+   exp:"AWS Professional Services delivers offerings (activities, best practices, documentation) for enterprise cloud adoption through paid engagements. Created the AWS Cloud Adoption Framework (CAF).\n\n• Enterprise Support → 24/7 tech support + TAM\n• Concierge → billing/account experts\n• TAM → designated technical point of contact"},
+
+  {q:"A company has a hybrid cloud architecture where their on-premises data center interacts with their cloud resources in AWS. Which of the following services in AWS can you use to deploy a web application to the servers running on-premises? (Select TWO.)",
+   opts:["AWS CodeDeploy","AWS Elastic Beanstalk","AWS CloudFormation","AWS OpsWorks","AWS Batch"],
+   correct:[0,3],
+   exp:"For deploying to BOTH AWS and on-premises servers:\n• AWS OpsWorks → config management with Chef/Puppet (cloud + on-prem)\n• AWS CodeDeploy → automates deployments to EC2 AND on-premises\n\n• CloudFormation, Elastic Beanstalk → AWS resources only\n• Batch → batch computing jobs"},
+
+  {q:"Which of the following is true regarding Elastic Load Balancing?",
+   opts:["It distributes incoming application traffic across multiple targets, such as Amazon EC2 instances, in multiple Availability Zones.","It translates domain names (such as www.example.com) into numeric IP addresses (such as 192.0.2.1) that Amazon EC2 instances use to connect to each other.","It is a virtual server that allows you to run your applications in the AWS Cloud.","It automatically increases or decreases the number of instances as the demand of your application changes."],
+   correct:[0],
+   exp:"AWS Elastic Load Balancing distributes incoming application/network traffic across multiple targets (EC2, containers, Lambda, IPs) in multiple AZs. You must specify at least 2 AZ subnets.\n\n• Auto Scaling → scales instance count\n• Route 53 → DNS\n• EC2 → virtual server"},
+
+  {q:"What should you provide to your developers to allow them to access your AWS services through the AWS CLI?",
+   opts:["SSH keys","API keys","Access keys","IAM username and passwords"],
+   correct:[2],
+   exp:"Access keys (Access Key ID + Secret Access Key) are long-term credentials used for programmatic API/CLI calls. You cannot associate access keys with an IAM role (which uses temporary credentials).\n\n• Username/password → Console login\n• API keys → for API Gateway etc.\n• SSH keys → EC2 SSH connections"},
+
+  {q:"Which of the following options is an AWS Cloud Adoption Framework (CAF) perspective specifically tailored to ensure your cloud investments expedite your digital transformation goals and business outcomes?",
+   opts:["Business perspective","Operations perspective","People perspective","Governance perspective"],
+   correct:[0],
+   exp:"The Business Perspective aligns the organization's strategic objectives with its cloud adoption goals. Capabilities: Strategy Management, Product Management, Business Insights, Portfolio Management, Strategic Partnership, Data Science, Innovation Management, Data Monetization."},
+
+  {q:"Which of the following options below is solely the responsibility of the customer in accordance with the AWS shared responsibility model?",
+   opts:["Awareness & Training","Patching of the host operating system","Configuration Management","Service and Communications Protection or Zone Security"],
+   correct:[3],
+   exp:"Customer-Specific Controls (solely customer responsibility):\n• Service and Communications Protection / Zone Security\n• Routing/zoning data within specific security environments\n\n• Awareness & Training, Config Management → SHARED\n• Host OS patching → AWS responsibility"}
+];
+
+// ============================================================
+// STATE
+// ============================================================
+const STATE = {
+  currentIdx: 0,
+  answers: {},        // {qIdx: [optionIdx, ...]}
+  reviewFlags: {},    // {qIdx: true}
+  startTime: null,
+  endTime: null,
+  timerInterval: null,
+  timeLeft: 90 * 60,  // 90 minutes in seconds
+  submitted: false
+};
+
+// ============================================================
+// EXAM CONTROL
+// ============================================================
+function startExam() {
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('examScreen').classList.remove('hidden');
+  STATE.startTime = Date.now();
+  buildNavigator();
+  renderQuestion();
+  startTimer();
+}
+
+function startTimer() {
+  STATE.timerInterval = setInterval(() => {
+    STATE.timeLeft--;
+    updateTimerDisplay();
+    if (STATE.timeLeft <= 0) {
+      submitExam();
+    }
+  }, 1000);
+  updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(STATE.timeLeft / 60);
+  const s = STATE.timeLeft % 60;
+  const display = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  const el = document.getElementById('timer');
+  el.textContent = '⏱ ' + display;
+  el.classList.toggle('warning', STATE.timeLeft <= 600 && STATE.timeLeft > 300);
+  el.classList.toggle('danger', STATE.timeLeft <= 300);
+}
+
+function buildNavigator() {
+  const grid = document.getElementById('navGrid');
+  grid.innerHTML = '';
+  QUESTIONS.forEach((_, i) => {
+    const cell = document.createElement('button');
+    cell.className = 'nav-cell';
+    cell.textContent = i + 1;
+    cell.onclick = () => jumpTo(i);
+    cell.id = `nav-${i}`;
+    grid.appendChild(cell);
+  });
+}
+
+function updateNavigator() {
+  QUESTIONS.forEach((_, i) => {
+    const cell = document.getElementById(`nav-${i}`);
+    cell.classList.remove('current', 'answered', 'review');
+    if (STATE.answers[i] && STATE.answers[i].length > 0) cell.classList.add('answered');
+    if (STATE.reviewFlags[i]) cell.classList.add('review');
+    if (i === STATE.currentIdx) cell.classList.add('current');
+  });
+  // Stats
+  const answered = Object.values(STATE.answers).filter(a => a && a.length > 0).length;
+  const reviewing = Object.values(STATE.reviewFlags).filter(Boolean).length;
+  document.getElementById('statAnswered').textContent = answered;
+  document.getElementById('statUnanswered').textContent = QUESTIONS.length - answered;
+  document.getElementById('statReview').textContent = reviewing;
+}
+
+function renderQuestion() {
+  const q = QUESTIONS[STATE.currentIdx];
+  const isMulti = q.correct.length > 1;
+
+  document.getElementById('questionNumber').textContent = `Question ${STATE.currentIdx + 1}`;
+  document.getElementById('progressInfo').textContent = `Question ${STATE.currentIdx + 1} of ${QUESTIONS.length}`;
+  document.getElementById('questionText').textContent = q.q;
+  document.getElementById('multiHint').classList.toggle('hidden', !isMulti);
+
+  // Review button state
+  const reviewBtn = document.getElementById('reviewBtn');
+  const flagged = STATE.reviewFlags[STATE.currentIdx];
+  reviewBtn.classList.toggle('active', flagged);
+  document.getElementById('reviewIcon').textContent = flagged ? '★' : '☆';
+  document.getElementById('reviewText').textContent = flagged ? 'Marked for Review' : 'Mark for Review';
+
+  // Render options
+  const list = document.getElementById('optionsList');
+  list.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const li = document.createElement('li');
+    li.className = 'option' + (isMulti ? ' multi' : '');
+    const selected = (STATE.answers[STATE.currentIdx] || []).includes(i);
+    if (selected) li.classList.add('selected');
+
+    // Review mode styling
+    if (STATE.submitted) {
+      const userAns = STATE.answers[STATE.currentIdx] || [];
+      const isCorrect = q.correct.includes(i);
+      const userPicked = userAns.includes(i);
+      if (isCorrect) li.classList.add('review-correct');
+      if (userPicked && !isCorrect) li.classList.add('review-wrong');
+    }
+
+    li.onclick = () => selectOption(i);
+
+    const marker = document.createElement('div');
+    marker.className = 'option-marker';
+    marker.textContent = String.fromCharCode(65 + i);
+    li.appendChild(marker);
+
+    const text = document.createElement('div');
+    text.className = 'option-text';
+    text.textContent = opt;
+    li.appendChild(text);
+
+    // Review badges
+    if (STATE.submitted) {
+      const userAns = STATE.answers[STATE.currentIdx] || [];
+      const isCorrect = q.correct.includes(i);
+      const userPicked = userAns.includes(i);
+      if (isCorrect && userPicked) {
+        const b = document.createElement('span');
+        b.className = 'review-badge correct';
+        b.textContent = '✓ Correct';
+        li.appendChild(b);
+      } else if (isCorrect && !userPicked) {
+        const b = document.createElement('span');
+        b.className = 'review-badge missed';
+        b.textContent = 'Answer';
+        li.appendChild(b);
+      } else if (!isCorrect && userPicked) {
+        const b = document.createElement('span');
+        b.className = 'review-badge wrong';
+        b.textContent = '✗ Your pick';
+        li.appendChild(b);
+      }
+    }
+
+    list.appendChild(li);
+  });
+
+  // Explanation in review mode
+  const expEl = document.getElementById('explanation');
+  if (STATE.submitted) {
+    expEl.classList.add('visible');
+    const correctLetters = q.correct.map(i => String.fromCharCode(65 + i)).join(', ');
+    document.getElementById('explanationContent').innerHTML =
+      `<div class="correct-answer-line"><strong>Correct Answer${q.correct.length>1?'s':''}: ${correctLetters}</strong></div>` +
+      q.exp;
+  } else {
+    expEl.classList.remove('visible');
+  }
+
+  // Nav buttons
+  document.getElementById('prevBtn').disabled = STATE.currentIdx === 0;
+  const nextBtn = document.getElementById('nextBtn');
+  if (STATE.currentIdx === QUESTIONS.length - 1) {
+    nextBtn.textContent = STATE.submitted ? 'Last Question' : 'Review & Submit →';
+  } else {
+    nextBtn.textContent = 'Next →';
+  }
+
+  updateNavigator();
+}
+
+function selectOption(i) {
+  if (STATE.submitted) return;
+  const q = QUESTIONS[STATE.currentIdx];
+  const isMulti = q.correct.length > 1;
+  if (!STATE.answers[STATE.currentIdx]) STATE.answers[STATE.currentIdx] = [];
+  const arr = STATE.answers[STATE.currentIdx];
+
+  if (isMulti) {
+    const idx = arr.indexOf(i);
+    if (idx >= 0) {
+      arr.splice(idx, 1);
+    } else {
+      if (arr.length >= q.correct.length) {
+        // Replace oldest selection
+        arr.shift();
+      }
+      arr.push(i);
+    }
+  } else {
+    STATE.answers[STATE.currentIdx] = [i];
+  }
+  renderQuestion();
+}
+
+function clearAnswer() {
+  if (STATE.submitted) return;
+  delete STATE.answers[STATE.currentIdx];
+  renderQuestion();
+}
+
+function nextQuestion() {
+  if (STATE.currentIdx < QUESTIONS.length - 1) {
+    STATE.currentIdx++;
+    renderQuestion();
+    scrollTop();
+  } else if (!STATE.submitted) {
+    confirmEnd();
+  }
+}
+
+function prevQuestion() {
+  if (STATE.currentIdx > 0) {
+    STATE.currentIdx--;
+    renderQuestion();
+    scrollTop();
+  }
+}
+
+function jumpTo(i) {
+  STATE.currentIdx = i;
+  renderQuestion();
+  scrollTop();
+}
+
+function scrollTop() {
+  document.querySelector('.question-panel').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function toggleReview() {
+  STATE.reviewFlags[STATE.currentIdx] = !STATE.reviewFlags[STATE.currentIdx];
+  renderQuestion();
+}
+
+// ============================================================
+// MODAL & SUBMISSION
+// ============================================================
+function confirmEnd() {
+  const answered = Object.values(STATE.answers).filter(a => a && a.length > 0).length;
+  const unanswered = QUESTIONS.length - answered;
+  const reviewing = Object.values(STATE.reviewFlags).filter(Boolean).length;
+  const incomplete = Object.entries(STATE.answers).filter(([k,v]) => {
+    const q = QUESTIONS[parseInt(k)];
+    return v.length > 0 && v.length < q.correct.length;
+  }).length;
+
+  document.getElementById('modalTitle').textContent = 'Submit Exam?';
+  document.getElementById('modalBody').innerHTML = `
+    <p>Are you sure you want to end the exam? Once submitted, you cannot change your answers.</p>
+    <div class="summary-list">
+      <div class="summary-list-item"><span>Total Questions</span><strong>${QUESTIONS.length}</strong></div>
+      <div class="summary-list-item"><span>Answered</span><strong style="color:var(--success)">${answered}</strong></div>
+      <div class="summary-list-item"><span>Unanswered</span><strong style="color:${unanswered>0?'var(--danger)':'var(--text-muted)'}">${unanswered}</strong></div>
+      <div class="summary-list-item"><span>Incomplete (multi-select)</span><strong style="color:${incomplete>0?'var(--warning)':'var(--text-muted)'}">${incomplete}</strong></div>
+      <div class="summary-list-item"><span>Marked for Review</span><strong>${reviewing}</strong></div>
+    </div>
+  `;
+  document.getElementById('modal').classList.add('visible');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('visible');
+}
+
+function submitExam() {
+  closeModal();
+  clearInterval(STATE.timerInterval);
+  STATE.endTime = Date.now();
+  STATE.submitted = true;
+  showResults();
+}
+
+// ============================================================
+// RESULTS
+// ============================================================
+function showResults() {
+  let correct = 0, wrong = 0, skipped = 0;
+  QUESTIONS.forEach((q, i) => {
+    const ans = STATE.answers[i] || [];
+    if (ans.length === 0) {
+      skipped++;
+    } else {
+      // Compare sorted arrays
+      const sortedAns = [...ans].sort();
+      const sortedCorrect = [...q.correct].sort();
+      const match = sortedAns.length === sortedCorrect.length &&
+                    sortedAns.every((v,idx) => v === sortedCorrect[idx]);
+      if (match) correct++;
+      else wrong++;
+    }
+  });
+
+  const score = Math.round((correct / QUESTIONS.length) * 100);
+  const passed = score >= 70;
+
+  document.getElementById('examScreen').classList.add('hidden');
+  document.getElementById('resultsScreen').classList.remove('hidden');
+
+  const header = document.getElementById('resultsHeader');
+  header.className = 'results-header ' + (passed ? 'pass' : 'fail');
+
+  document.getElementById('scoreValue').textContent = score + '%';
+  document.getElementById('resultsVerdict').textContent = passed ? '🎉 Congratulations — You Passed!' : '📚 Keep Practicing';
+  document.getElementById('resultsSubtext').textContent = passed
+    ? `You scored above the 70% passing threshold.`
+    : `You need at least 70% to pass. Review the explanations and try again.`;
+
+  document.getElementById('statCorrect').textContent = correct;
+  document.getElementById('statWrong').textContent = wrong;
+  document.getElementById('statSkipped').textContent = skipped;
+
+  const elapsed = Math.floor((STATE.endTime - STATE.startTime) / 1000);
+  const eM = Math.floor(elapsed / 60);
+  const eS = elapsed % 60;
+  document.getElementById('statTime').textContent = `${eM}m ${eS}s`;
+}
+
+function reviewAnswers() {
+  document.getElementById('resultsScreen').classList.add('hidden');
+  document.getElementById('examScreen').classList.remove('hidden');
+  STATE.currentIdx = 0;
+  // Hide timer and end button during review
+  document.getElementById('timer').style.display = 'none';
+  document.querySelector('.btn-danger').textContent = '← Back to Results';
+  document.querySelector('.btn-danger').onclick = () => {
+    document.getElementById('examScreen').classList.add('hidden');
+    document.getElementById('resultsScreen').classList.remove('hidden');
+  };
+  renderQuestion();
+  scrollTop();
+}
+
+function restartExam() {
+  STATE.currentIdx = 0;
+  STATE.answers = {};
+  STATE.reviewFlags = {};
+  STATE.timeLeft = 90 * 60;
+  STATE.submitted = false;
+  STATE.startTime = null;
+  STATE.endTime = null;
+  document.getElementById('resultsScreen').classList.add('hidden');
+  document.getElementById('startScreen').classList.remove('hidden');
+  document.getElementById('timer').style.display = '';
+  const endBtn = document.querySelector('.btn-danger');
+  endBtn.textContent = 'End Exam';
+  endBtn.onclick = confirmEnd;
+}
+
+// ============================================================
+// STUDY TIPS & TOPIC TAGS (per question)
+// ============================================================
+const STUDY_DATA = [
+  {topic:"S3 / Storage", tip:"🧠 Remember the S3 access trio: Bucket Policy (account-wide JSON), IAM Policy (user-level), ACL (legacy object-level). For 'give specific users access to a bucket' → Bucket Policy is the default answer."},
+  {topic:"Global Infrastructure", tip:"🧠 Region > AZ > Data Center. An AZ = 1+ data centers with redundant power/networking. Memorize: 'Each AZ is an independent failure zone in lower-risk flood plains.'"},
+  {topic:"CloudFront / Edge", tip:"🧠 Edge location = CloudFront cache POP. Two benefits to memorize: (1) lower latency to users, (2) reduces origin load. If you see 'edge computing device' think Snowball Edge, NOT edge location."},
+  {topic:"RDS / Databases", tip:"🧠 RDS = managed relational DB. Keywords: 'easy to set up/operate/scale' + 'automates admin tasks'. NOT serverless, NOT NoSQL. Auto-scaling is for storage only, not instance size."},
+  {topic:"EC2 Pricing", tip:"🧠 EC2 discount ladder: Spot (up to 90%) > Standard RI 3-yr All Upfront (up to 75%) > Convertible RI (up to 54%) > Savings Plans > On-Demand. '90% discount' = always Spot."},
+  {topic:"DynamoDB / NoSQL", tip:"🧠 DynamoDB = fully managed NoSQL, single-digit ms latency, seamless scaling. Trigger words: 'unpredictable traffic', 'non-relational', 'flexible schema', 'serverless DB'."},
+  {topic:"Provisioning Tools", tip:"🧠 4 ways to provision AWS resources: Console (GUI), CLI (terminal), SDK (code), CloudFormation (IaC). Concierge is a human (Enterprise Support agent), not a tool."},
+  {topic:"IAM", tip:"🧠 Access keys = IAM User (or root). IAM Roles use temporary credentials, NOT access keys. Best practice: prefer roles over long-term access keys."},
+  {topic:"VPC / Hybrid", tip:"🧠 On-prem ↔ VPC connection = Customer Gateway (your side) + Virtual Private Gateway (AWS side). Route 53 Resolver handles hybrid DNS. NAT GW and VPC Peering do NOT connect to on-prem."},
+  {topic:"RDS / Databases", tip:"🧠 SQL Server in AWS = EC2 (full control) OR RDS (managed). Aurora is MySQL/PostgreSQL only — NOT SQL Server. Watch for 'urgent' + 'new database' = these two options."},
+  {topic:"Cost Management", tip:"🧠 4 cost tools: Cost Explorer (visualize), Budgets (alerts), Cost & Usage Report (most granular, exports to Athena/Redshift/QuickSight), Pricing Calculator (estimate). Granular RI usage = CUR."},
+  {topic:"Compliance / Audit", tip:"🧠 AWS Artifact = ONE-STOP for compliance docs (SOC, PCI, ISO, HIPAA BAA). If question mentions downloading certifications/agreements → Artifact. CloudTrail = API audit (different)."},
+  {topic:"Global Infrastructure", tip:"🧠 Hierarchy: Region CONTAINS multiple AZs. AZ does NOT contain edge locations. Edge locations are independent and connect to CloudFront, not to AZs."},
+  {topic:"VPC / Security", tip:"🧠 VPC security layers: Security Groups (instance-level, stateful) + Network ACLs (subnet-level, stateless). Both live in the VPC Dashboard. CloudFront/Route53/Lambda have separate dashboards."},
+  {topic:"Cost Management", tip:"🧠 Cost Allocation Tags = key:value labels for categorizing AWS costs. Must be activated in Billing console. Two types: AWS-generated and User-defined."},
+  {topic:"IAM / Security", tip:"🧠 IAM hardening checklist: MFA + strong password policy + key rotation + least privilege + no root keys. Security Groups and NACLs are NETWORK security, not IAM."},
+  {topic:"Shared Responsibility", tip:"🧠 The 3 buckets: Inherited (physical—AWS), Customer-only (data, IAM, OS config), Shared (Patching, Config Mgmt, Awareness & Training). Memorize the 3 shared items!"},
+  {topic:"Cloud Economics", tip:"🧠 Cloud value prop: trade CAPEX for OPEX. Lower upfront + lower variable costs. 'Pay-as-you-go' = lower variable. No data center = lower upfront."},
+  {topic:"Cost Management", tip:"🧠 AWS Budgets is the ONLY tool that sets thresholds and sends alerts. 'Coverage targets' and 'utilization drops below threshold' = Budgets. Used with RI/Savings Plans."},
+  {topic:"Shared Responsibility", tip:"🧠 If question says 'manage guest OS, patches, updates' = EC2. Fully managed services (Aurora, DynamoDB, DocumentDB) hide the OS — you can't touch it."},
+  {topic:"Load Balancing", tip:"🧠 ALB (Layer 7) = path-based, host-based, WebSockets, HTTP/HTTPS. NLB (Layer 4) = TCP/UDP/TLS, millions of req/sec. GWLB (Layer 3/4) = third-party appliances. CLB = legacy."},
+  {topic:"Storage", tip:"🧠 'Rapidly changing data + low latency' = EBS, RDS, DynamoDB. S3 has higher latency — designed for static content. Snowball = migration, not storage."},
+  {topic:"Monitoring / Logging", tip:"🧠 The Big 3: CloudWatch (metrics/logs/alarms), CloudTrail (API calls audit), Config (resource configuration history). Don't mix these up — common exam trap!"},
+  {topic:"Cloud Computing", tip:"🧠 AWS speeds provisioning via 3 programmatic interfaces: Console, CLI, SDK + CloudFormation/CDK for IaC. Eliminates weeks of hardware procurement."},
+  {topic:"Global Infrastructure", tip:"🧠 Service scope cheat sheet: GLOBAL (IAM, STS, Route53, CloudFront, WAF), ZONAL (EC2 instance, EBS volume), REGIONAL (everything else — S3, EFS, Batch, RDS, etc.)."},
+  {topic:"CloudFront / S3", tip:"🧠 Global low-latency static content delivery = S3 (origin) + CloudFront (CDN). The classic combo. EFS/Glacier don't directly attach to CloudFront."},
+  {topic:"Region Selection", tip:"🧠 4 factors when choosing a Region: (1) Latency to users, (2) Data sovereignty/compliance, (3) Service availability, (4) Pricing. NOT on-site visits — that's an on-prem concept."},
+  {topic:"Best Practices", tip:"🧠 Trusted Advisor = inspects environment, gives recommendations. 5 categories: Cost Optimization, Security, Fault Tolerance, Performance, Service Limits. Acronym: CSFPS."},
+  {topic:"High Availability", tip:"🧠 ALB minimum = 2 AZs (always). 1 AZ = no HA. 3+ AZs = better but minimum is always 2. Same rule for RDS Multi-AZ."},
+  {topic:"Multi-Account", tip:"🧠 AWS Control Tower = governance + landing zone + guardrails for multi-account. Different from: Quick Starts (templates), Trusted Advisor (recommendations), Config (rules)."},
+  {topic:"AWS Support", tip:"🧠 Basic plan (free) = docs, whitepapers, forums, service health, 24x7 customer service for billing only. NO technical support, NO Trusted Advisor (full), NO Support API."},
+  {topic:"AWS Support", tip:"🧠 Developer plan: 1 contact, 12-24h response, 7 Core Trusted Advisor checks (limited), NO Support API, NO TAM. For 'testing/experimenting'."},
+  {topic:"Cost Management", tip:"🧠 Cost & Usage Reports (CUR) = MOST granular cost data. Only tool that exports to Athena/Redshift/QuickSight. If question mentions any of those services + costs → CUR."},
+  {topic:"Migration / DR", tip:"🧠 AWS Elastic Disaster Recovery (DRS) = on-prem → AWS DR with point-in-time recovery. Don't confuse: MGN (migration), DMS (database migration), Migration Hub (tracking)."},
+  {topic:"Monitoring / Logging", tip:"🧠 'Event history of account activity' / 'who did what when' = CloudTrail. Console actions, SDK calls, CLI commands — all logged. Default 90-day history is free."},
+  {topic:"EC2 Pricing", tip:"🧠 Maximum savings formula: Standard RI + 3-year + All Upfront. Standard > Convertible for savings. 3-yr > 1-yr. All Upfront > Partial > No Upfront."},
+  {topic:"AWS Partners", tip:"🧠 APN Consulting Partners = professional services firms (SIs, MSPs) — help DESIGN/BUILD/MIGRATE. Technology Partners = ISVs selling software. Marketplace = buy software."},
+  {topic:"S3 / Storage", tip:"🧠 S3 keywords: object storage, virtually unlimited, 11 9s durability, scalable. NOT block (EBS), NOT file system (EFS), NOT hybrid (Storage Gateway)."},
+  {topic:"Integration / Messaging", tip:"🧠 4 integration services: EventBridge (event bus, SaaS events), SNS (pub/sub), SQS (queues), Kinesis (streaming). 'Event-driven decoupling' = EventBridge specifically."},
+  {topic:"AWS Support", tip:"🧠 Support API access starts at Business plan. Business = most cost-effective with API. Enterprise = adds TAM, Concierge, IEM, 15min response for critical."},
+  {topic:"Best Practices", tip:"🧠 Trusted Advisor 5 categories acronym 'COSPFS': Cost Optimization, Security, Fault Tolerance, Performance, Service Limits. Memorize all five."},
+  {topic:"Multi-Account / Billing", tip:"🧠 Consolidated Billing benefits: ONE bill, easy tracking, COMBINED usage for volume discounts, FREE. Master pays for members. AWS ≠ AISPL accounts (can't merge)."},
+  {topic:"Auto Scaling", tip:"🧠 'Automatically scale EC2 based on traffic' = AWS Auto Scaling (or EC2 Auto Scaling). Macie = data security, CloudTrail = audit, Lightsail = VPS."},
+  {topic:"Hybrid Architecture", tip:"🧠 Hybrid = cloud + on-prem mixed. EC2 ↔ on-prem API = hybrid. Watch out: SaaS/PaaS/IaaS are service MODELS, not architecture types. Serverless = Lambda."},
+  {topic:"High Availability", tip:"🧠 The HA mantra: 'Use multiple AZs'. Single component failure should never bring down your app. Spot instances ≠ HA (they get interrupted)."},
+  {topic:"IAM", tip:"🧠 Managing many users → IAM Groups. Attach policy to group → all users inherit. Adding/removing users from groups is easier than editing individual policies."},
+  {topic:"Networking / DNS", tip:"🧠 Route 53 = DNS web service. Translates domain names → IPs. Has routing policies (latency, geo, weighted, failover) + health checks. NOT Rekognition (vision AI)."},
+  {topic:"IAM / Security", tip:"🧠 IAM Access Analyzer does 3 things: (1) finds resources shared externally, (2) validates policies, (3) GENERATES policies from CloudTrail activity. Key phrase: 'external entity'."},
+  {topic:"Cloud Adoption Framework", tip:"🧠 CAF has 6 perspectives: Business, People, Governance, Platform, Security, Operations. 'Secure migration' = Security perspective. Memorize all 6!"},
+  {topic:"Security", tip:"🧠 AWS Security Hub = central dashboard for security findings + compliance checks (PCI DSS, HIPAA, CIS). Aggregates from GuardDuty, Inspector, Macie + 3rd-party."},
+  {topic:"Developer Tools", tip:"🧠 3 ways to interact programmatically: CLI (commands), SDK (code in Python/Java/Node/etc.), CloudFormation (IaC). Console is the 4th but it's not 'programmatic'."},
+  {topic:"EC2 Pricing", tip:"🧠 Convertible RI = can change family, OS, tenancy mid-term. Standard RI = can only change size, AZ, network. If question says 'change family/OS/tenancy' → Convertible."},
+  {topic:"Cost Management", tip:"🧠 NEW to AWS = use Pricing Calculator (estimates based on planned usage). EXISTING workloads = use Cost Explorer (forecasts from past usage). Key difference!"},
+  {topic:"Cloud Economics", tip:"🧠 The core trade: replace UPFRONT CAPEX with LOW VARIABLE costs. Memorize this exact phrase — it appears in many exam questions."},
+  {topic:"EC2 Pricing", tip:"🧠 BYOL (Bring Your Own License) for per-socket/per-core software = Dedicated Hosts (NOT Dedicated Instances). Dedicated Host gives visibility into physical placement."},
+  {topic:"S3 / Storage Classes", tip:"🧠 Glacier retrieval times: Instant Retrieval (ms), Flexible Retrieval (minutes-hours, has Expedited 1-5min option), Deep Archive (12-48h). 'Minutes' = Flexible Retrieval."},
+  {topic:"Multi-Account / Billing", tip:"🧠 Volume pricing = combine usage across linked accounts to hit lower per-unit tiers. Saves money on tiered services like S3 data transfer and EC2 hours."},
+  {topic:"Databases", tip:"🧠 'Highly scalable MySQL OLTP' = Aurora (MySQL-compatible, 5x faster, auto-scaling storage to 128TB, up to 15 read replicas). OLTP ≠ OLAP (that's Redshift)."},
+  {topic:"Caching", tip:"🧠 SQL query caching = ElastiCache (Redis or Memcached). DAX = ONLY for DynamoDB. CloudFront = web content CDN. Don't mix these up — common exam trap."},
+  {topic:"AWS Channels / Support", tip:"🧠 AWS Professional Services = PAID engagements for enterprise cloud adoption + created the CAF. Different from Enterprise Support (24x7 + TAM) and Concierge (billing)."},
+  {topic:"Hybrid Deployment", tip:"🧠 Two services that deploy to BOTH cloud + on-prem: OpsWorks (Chef/Puppet) and CodeDeploy. CloudFormation and Elastic Beanstalk are AWS-only."},
+  {topic:"Load Balancing", tip:"🧠 ELB definition: distributes incoming traffic to multiple targets across multiple AZs. NOT auto-scaling (that's ASG). NOT DNS (Route 53). NOT virtual servers (EC2)."},
+  {topic:"IAM", tip:"🧠 CLI/API access = Access Keys (Access Key ID + Secret Access Key). Console access = username + password. Don't use root access keys — best practice violation."},
+  {topic:"Cloud Adoption Framework", tip:"🧠 Business perspective = align cloud with business strategy. Capabilities: Strategy Mgmt, Product Mgmt, Business Insights, Portfolio Mgmt, Innovation Mgmt, etc."},
+  {topic:"Shared Responsibility", tip:"🧠 Customer-only: data, encryption, IAM, network config (Security Groups/NACLs), guest OS, app code. 'Service & Communications Protection' = customer-specific control."}
+];
+
+// ============================================================
+// STUDY NOTES SCREEN
+// ============================================================
+function showStudyNotes() {
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('examScreen').classList.add('hidden');
+  document.getElementById('resultsScreen').classList.add('hidden');
+  document.getElementById('studyNotesScreen').classList.remove('hidden');
+  renderTopicIndex();
+  renderStudyNotes('all');
+  // Attach filter handlers
+  document.querySelectorAll('.filter-tab').forEach(tab => {
+    tab.onclick = () => {
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      renderStudyNotes(tab.dataset.filter);
+    };
+  });
+  // Attach search handler
+  document.getElementById('notesSearch').oninput = (e) => {
+    filterBySearch(e.target.value);
+  };
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function backFromNotes() {
+  document.getElementById('studyNotesScreen').classList.add('hidden');
+  // Show whichever screen makes sense
+  if (STATE.submitted) {
+    document.getElementById('resultsScreen').classList.remove('hidden');
+  } else {
+    document.getElementById('startScreen').classList.remove('hidden');
+  }
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function renderTopicIndex() {
+  const grid = document.getElementById('topicGrid');
+  const counts = {};
+  STUDY_DATA.forEach(s => {
+    counts[s.topic] = (counts[s.topic] || 0) + 1;
+  });
+  const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]);
+  grid.innerHTML = sorted.map(([topic, count]) => `
+    <div class="topic-chip" onclick="searchTopic('${topic.replace(/'/g,"\\'")}')">
+      <span class="name">${topic}</span>
+      <span class="count">${count}</span>
+    </div>
+  `).join('');
+}
+
+function searchTopic(topic) {
+  const input = document.getElementById('notesSearch');
+  input.value = topic;
+  filterBySearch(topic);
+  window.scrollTo({top: document.getElementById('notesList').offsetTop - 80, behavior: 'smooth'});
+}
+
+function renderStudyNotes(filter) {
+  const list = document.getElementById('notesList');
+  list.innerHTML = '';
+
+  QUESTIONS.forEach((q, i) => {
+    // Filter logic
+    if (filter === 'wrong' && STATE.submitted) {
+      const ans = STATE.answers[i] || [];
+      if (ans.length === 0) return;
+      const sortedAns = [...ans].sort();
+      const sortedCorrect = [...q.correct].sort();
+      const match = sortedAns.length === sortedCorrect.length &&
+                    sortedAns.every((v,idx) => v === sortedCorrect[idx]);
+      if (match) return;
+    }
+    if (filter === 'skipped' && STATE.submitted) {
+      const ans = STATE.answers[i] || [];
+      if (ans.length > 0) return;
+    }
+    if (filter === 'wrong' && !STATE.submitted) return;
+    if (filter === 'skipped' && !STATE.submitted) return;
+    if (filter === 'multi' && q.correct.length === 1) return;
+
+    const isMulti = q.correct.length > 1;
+    const correctLetters = q.correct.map(idx => String.fromCharCode(65 + idx));
+    const study = STUDY_DATA[i] || {topic:"General", tip:"Review the concept thoroughly."};
+
+    const card = document.createElement('div');
+    card.className = 'note-card';
+    card.dataset.qIdx = i;
+    card.dataset.topic = study.topic.toLowerCase();
+    card.dataset.qtext = q.q.toLowerCase();
+
+    const answersHTML = q.correct.map(idx => `
+      <div class="answer-pill">
+        <span class="letter">${String.fromCharCode(65 + idx)}</span>
+        <span>${escapeHtml(q.opts[idx])}</span>
+      </div>
+    `).join('');
+
+    card.innerHTML = `
+      <div class="note-card-header">
+        <div class="note-num-badge">${i + 1}</div>
+        <div class="note-q-text">${escapeHtml(q.q)}</div>
+        <div class="note-type-tag ${isMulti ? 'multi' : 'single'}">${isMulti ? 'Multi · '+q.correct.length : 'Single'}</div>
+      </div>
+      <div class="note-card-body">
+        <div class="note-section">
+          <div class="note-section-label">✅ Correct Answer${isMulti ? 's' : ''}</div>
+          <div>${answersHTML}</div>
+        </div>
+        <div class="note-section">
+          <div class="note-section-label">💡 Why This Is Right</div>
+          <div class="why-box">${escapeHtml(q.exp)}</div>
+        </div>
+        <div class="note-section">
+          <div class="note-section-label">📌 Tip to Remember · <span style="color:var(--aws-orange);text-transform:none;letter-spacing:0;">${escapeHtml(study.topic)}</span></div>
+          <div class="tip-box">${escapeHtml(study.tip)}</div>
+        </div>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  if (list.children.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:14px;">No questions match this filter. Try a different one.</div>';
+  }
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function filterBySearch(query) {
+  query = query.toLowerCase().trim();
+  document.querySelectorAll('.note-card').forEach(card => {
+    if (!query) {
+      card.classList.remove('hidden-card');
+      return;
+    }
+    const match = card.dataset.topic.includes(query) || card.dataset.qtext.includes(query);
+    card.classList.toggle('hidden-card', !match);
+  });
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (document.getElementById('examScreen').classList.contains('hidden')) return;
+  if (document.getElementById('modal').classList.contains('visible')) return;
+  if (e.key === 'ArrowRight') nextQuestion();
+  if (e.key === 'ArrowLeft') prevQuestion();
+  if (e.key === 'm' || e.key === 'M') toggleReview();
+  // A-E for option selection
+  if (!STATE.submitted) {
+    const idx = ['a','b','c','d','e'].indexOf(e.key.toLowerCase());
+    const q = QUESTIONS[STATE.currentIdx];
+    if (idx >= 0 && idx < q.opts.length) selectOption(idx);
+  }
+});
+</script>
+
+</body>
+</html>
