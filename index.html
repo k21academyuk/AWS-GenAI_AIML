@@ -1,45 +1,377 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>K21 Academy – AWS Practice Tests</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>K21 Academy | AWS AIF-C01 Practice Tests</title>
+  <meta name="description" content="Prepare for the AWS Certified AI Practitioner (AIF-C01) exam with realistic mock tests, domain-aligned coverage, and a clean exam simulator experience." />
   <style>
-    body { font-family: sans-serif; max-width: 800px; margin: 60px auto; padding: 0 20px; background: #f4f6f9; color: #1a1a2e; }
-    h1 { color: #232f3e; }
-    .card { background: white; border-radius: 10px; padding: 24px; margin: 16px 0; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    .card h2 { margin: 0 0 8px; font-size: 1.1rem; }
-    .card p { margin: 0 0 16px; color: #555; }
-    a.btn { background: #ff9900; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; }
-    a.btn:hover { background: #e68a00; }
+    :root{
+      --aws-navy:#232f3e;
+      --aws-navy-2:#1a2532;
+      --aws-orange:#ff9900;
+      --aws-orange-dark:#ec7211;
+      --bg:#f5f7fb;
+      --card:#ffffff;
+      --border:#d5dbdb;
+      --text:#16191f;
+      --muted:#5f6b7a;
+      --success:#037f0c;
+      --shadow:0 10px 30px rgba(35,47,62,0.08);
+      --radius:18px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+      background:linear-gradient(180deg,#eef3f9 0%, #f7f9fc 100%);
+      color:var(--text);
+    }
+
+    .hero{
+      background:linear-gradient(135deg,var(--aws-navy) 0%, var(--aws-navy-2) 100%);
+      color:#fff;
+      padding:72px 20px 56px;
+    }
+
+    .container{
+      max-width:1100px;
+      margin:0 auto;
+    }
+
+    .badge{
+      display:inline-block;
+      padding:8px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.12);
+      border:1px solid rgba(255,255,255,0.18);
+      font-size:14px;
+      margin-bottom:18px;
+    }
+
+    h1{
+      margin:0 0 14px;
+      font-size:clamp(2rem,4vw,3.5rem);
+      line-height:1.1;
+      max-width:780px;
+    }
+
+    .hero p{
+      margin:0;
+      max-width:760px;
+      color:rgba(255,255,255,0.86);
+      font-size:1.08rem;
+      line-height:1.7;
+    }
+
+    .hero-stats{
+      display:flex;
+      flex-wrap:wrap;
+      gap:14px;
+      margin-top:28px;
+    }
+
+    .stat{
+      background:rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.14);
+      border-radius:14px;
+      padding:14px 18px;
+      min-width:170px;
+    }
+
+    .stat strong{
+      display:block;
+      font-size:1.1rem;
+      margin-bottom:4px;
+    }
+
+    .main{
+      padding:42px 20px 64px;
+    }
+
+    .section-title{
+      margin:0 0 10px;
+      font-size:1.8rem;
+      color:var(--aws-navy);
+    }
+
+    .section-copy{
+      margin:0 0 28px;
+      color:var(--muted);
+      max-width:760px;
+      line-height:1.7;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      gap:22px;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:24px;
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+
+    .card-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+    }
+
+    .pill{
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.04em;
+      text-transform:uppercase;
+      color:var(--aws-orange-dark);
+      background:#fff4e5;
+      border:1px solid #ffe0b2;
+      padding:8px 10px;
+      border-radius:999px;
+      white-space:nowrap;
+    }
+
+    .card h3{
+      margin:0;
+      font-size:1.35rem;
+      color:var(--aws-navy);
+    }
+
+    .card p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.65;
+    }
+
+    .features{
+      padding-left:18px;
+      margin:0;
+      color:#334155;
+      line-height:1.7;
+    }
+
+    .features li{margin-bottom:6px}
+
+    .btn{
+      margin-top:auto;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      text-decoration:none;
+      background:var(--aws-orange);
+      color:#111827;
+      font-weight:800;
+      padding:14px 18px;
+      border-radius:12px;
+      transition:.2s ease;
+      border:1px solid rgba(0,0,0,0.06);
+    }
+
+    .btn:hover{
+      background:var(--aws-orange-dark);
+      color:#fff;
+      transform:translateY(-1px);
+    }
+
+    .domains{
+      margin-top:44px;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+
+    .domains-header{
+      padding:20px 24px;
+      background:#f9fafb;
+      border-bottom:1px solid var(--border);
+    }
+
+    .domains-header h3{
+      margin:0 0 6px;
+      color:var(--aws-navy);
+    }
+
+    .domains-header p{
+      margin:0;
+      color:var(--muted);
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      background:#fff;
+    }
+
+    th,td{
+      padding:16px 24px;
+      text-align:left;
+      border-bottom:1px solid #eef2f7;
+    }
+
+    th{
+      background:#fff;
+      color:#334155;
+      font-size:.95rem;
+    }
+
+    td:last-child, th:last-child{
+      text-align:right;
+      font-weight:700;
+    }
+
+    .footer{
+      padding:28px 20px 56px;
+      color:var(--muted);
+      text-align:center;
+      font-size:.95rem;
+    }
+
+    @media (max-width:640px){
+      .hero{padding-top:56px}
+      th,td{padding:14px 12px;font-size:.92rem}
+      .stat{min-width:unset;flex:1 1 100%}
+    }
   </style>
 </head>
 <body>
-  <h1>☁️ AWS Certification Practice Tests</h1>
-  <p>Free practice sets to help you prepare for AWS certifications.</p>
+  <header class="hero">
+    <div class="container">
+      <span class="badge">K21 Academy • AWS Certification Practice Hub</span>
+      <h1>AWS Certified AI Practitioner (AIF-C01) Practice Tests</h1>
+      <p>
+        Practice in a realistic exam environment with timed mock tests, question navigation,
+        and instant feedback. Choose a mock test below and start preparing with confidence.
+      </p>
 
-  <h2 style="margin-top:40px;">AWS AI Practitioner (AIF-C01)</h2>
+      <div class="hero-stats">
+        <div class="stat">
+          <strong>3 Mock Tests</strong>
+          <span>Structured practice sets</span>
+        </div>
+        <div class="stat">
+          <strong>Real Exam Feel</strong>
+          <span>Timer, navigator, feedback</span>
+        </div>
+        <div class="stat">
+          <strong>5 Domains</strong>
+          <span>Aligned to AIF-C01 blueprint</span>
+        </div>
+      </div>
+    </div>
+  </header>
 
-  <div class="card">
-    <h2>Mock Test 1</h2>
-    <p>65 questions covering AWS AI/ML fundamentals.</p>
-    <a class="btn" href="./aif-c01/test-1/">Start Test →</a>
-  </div>
+  <main class="main">
+    <div class="container">
+      <h2 class="section-title">Choose your mock test</h2>
+      <p class="section-copy">
+        Each attached file is an AIF-C01 practice simulator covering the same core exam domains:
+        AI/ML fundamentals, generative AI, foundation model applications, responsible AI, and security,
+        compliance, and governance. [file:61][file:62][file:63]
+      </p>
 
-  <div class="card">
-    <h2>Mock Test 2</h2>
-    <p>65 questions on GenAI, Bedrock, and responsible AI.</p>
-    <a class="btn" href="./aif-c01/test-2/">Start Test →</a>
-  </div>
+      <section class="grid">
+        <article class="card">
+          <div class="card-top">
+            <h3>Mock Test 1</h3>
+            <span class="pill">Starter</span>
+          </div>
+          <p>Begin with the first AIF-C01 simulator and get comfortable with the exam flow.</p>
+          <ul class="features">
+            <li>Real exam-style interface</li>
+            <li>Timer and question navigator</li>
+            <li>Instant feedback workflow</li>
+          </ul>
+          <a class="btn" href="./aif-c01/test-1/">Start Mock Test 1</a>
+        </article>
 
-  <div class="card">
-    <h2>Mock Test 3</h2>
-    <p>65 questions – advanced AIF-C01 practice set.</p>
-    <a class="btn" href="./aif-c01/test-3/">Start Test →</a>
-  </div>
+        <article class="card">
+          <div class="card-top">
+            <h3>Mock Test 2</h3>
+            <span class="pill">Practice</span>
+          </div>
+          <p>Reinforce coverage with a second simulator using the same domain-aligned structure.</p>
+          <ul class="features">
+            <li>Balanced AIF-C01 coverage</li>
+            <li>Practice under timed conditions</li>
+            <li>Helpful for repetition and review</li>
+          </ul>
+          <a class="btn" href="./aif-c01/test-2/">Start Mock Test 2</a>
+        </article>
 
-  <footer style="margin-top:60px; color:#888; font-size:0.85rem;">
-    © 2026 K21 Academy. All rights reserved.
+        <article class="card">
+          <div class="card-top">
+            <h3>Mock Test 3</h3>
+            <span class="pill">Challenge</span>
+          </div>
+          <p>Use the third simulator as a final confidence check before the actual exam.</p>
+          <ul class="features">
+            <li>Full mock experience</li>
+            <li>Same domain blueprint coverage</li>
+            <li>Good for final revision rounds</li>
+          </ul>
+          <a class="btn" href="./aif-c01/test-3/">Start Mock Test 3</a>
+        </article>
+      </section>
+
+      <section class="domains">
+        <div class="domains-header">
+          <h3>AIF-C01 domain coverage</h3>
+          <p>These practice simulators are aligned to the five topic areas shown in your attached files. [file:61][file:62][file:63]</p>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Domain</th>
+              <th>Topic</th>
+              <th>Weight</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Domain 1</td>
+              <td>Fundamentals of AI &amp; ML</td>
+              <td>20%</td>
+            </tr>
+            <tr>
+              <td>Domain 2</td>
+              <td>Fundamentals of Generative AI</td>
+              <td>24%</td>
+            </tr>
+            <tr>
+              <td>Domain 3</td>
+              <td>Applications of Foundation Models</td>
+              <td>28%</td>
+            </tr>
+            <tr>
+              <td>Domain 4</td>
+              <td>Guidelines for Responsible AI</td>
+              <td>14%</td>
+            </tr>
+            <tr>
+              <td>Domain 5</td>
+              <td>Security, Compliance &amp; Governance</td>
+              <td>14%</td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+    </div>
+  </main>
+
+  <footer class="footer">
+    © 2026 K21 Academy • AWS Certification Practice Sets
   </footer>
 </body>
 </html>
