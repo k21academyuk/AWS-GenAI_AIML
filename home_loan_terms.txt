@@ -1,0 +1,8 @@
+Home Loan Product Terms:
+- Loan amount: 500000 to 50000000 rupees
+- Interest rate: 8.5% to 11% per annum
+- Tenure: up to 360 months (30 years)
+- Processing fee: 0.5% of loan amount
+- Minimum credit score: 700
+- LTV ratio: up to 80% of property value
+- Prepayment charges: nil for floating rate loans

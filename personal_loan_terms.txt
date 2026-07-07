@@ -1,0 +1,8 @@
+Personal Loan Product Terms:
+- Loan amount: 50000 to 4000000 rupees
+- Interest rate: 10.5% to 18% per annum based on credit profile
+- Tenure: 12 to 60 months
+- Processing fee: 2% of loan amount (min 1999)
+- Minimum credit score: 650
+- Minimum monthly income: 25000
+- Prepayment charges: 4% on outstanding for self-employed, nil for salaried after 12 EMIs

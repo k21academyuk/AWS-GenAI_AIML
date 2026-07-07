@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LoanGenie — Personal Loan Eligibility & Advisory</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+<style>
+  :root {
+    --navy:   #1A2942;
+    --blue:   #2E6DB4;
+    --teal:   #0E7C86;
+    --green:  #1E7E34;
+    --orange: #D35400;
+    --bg:     #F4F6FA;
+    --card:   #FFFFFF;
+    --border: #DDE3EE;
+    --text:   #1A2942;
+    --muted:  #6B7A99;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  /* HEADER */
+  header { background: var(--navy); padding: 16px 32px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+  .logo { display: flex; align-items: center; gap: 12px; }
+  .logo-icon { width: 40px; height: 40px; background: linear-gradient(135deg, #2E6DB4, #0E7C86); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+  .logo-text h1 { color: #fff; font-size: 20px; font-weight: 700; }
+  .logo-text p  { color: #8FA8CC; font-size: 12px; }
+  .badge { background: rgba(46,109,180,0.3); color: #8FC4FF; border: 1px solid rgba(143,196,255,0.3); padding: 4px 12px; border-radius: 20px; font-size: 12px; }
+
+  /* MAIN LAYOUT */
+  .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; display: grid; grid-template-columns: 300px 1fr; gap: 20px; }
+
+  /* SIDEBAR */
+  .sidebar { display: flex; flex-direction: column; gap: 16px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .card h3 { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
+
+  .api-row { display: flex; gap: 8px; }
+  .api-input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; color: var(--text); outline: none; }
+  .api-input:focus { border-color: var(--blue); }
+  .btn-connect { padding: 8px 16px; background: var(--blue); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .btn-connect:hover { background: #1A5CA0; }
+  .status { display: flex; align-items: center; gap: 6px; font-size: 12px; margin-top: 8px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #ccc; }
+  .dot.connected { background: var(--green); }
+  .dot.error { background: var(--orange); }
+
+  .quick-btn { width: 100%; text-align: left; padding: 9px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; font-size: 12px; color: var(--text); cursor: pointer; margin-bottom: 6px; transition: all .15s; line-height: 1.4; }
+  .quick-btn:hover { background: #E8EEF8; border-color: var(--blue); color: var(--blue); }
+
+  .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-item { background: var(--bg); border-radius: 8px; padding: 10px; text-align: center; }
+  .stat-val { font-size: 18px; font-weight: 700; color: var(--navy); }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* CHAT */
+  .chat-wrap { display: flex; flex-direction: column; gap: 16px; }
+  .chat-box { background: var(--card); border: 1px solid var(--border); border-radius: 12px; height: 520px; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; }
+  .chat-box::-webkit-scrollbar { width: 4px; }
+  .chat-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  /* MESSAGES */
+  .msg-user { display: flex; justify-content: flex-end; }
+  .bubble-user { max-width: 75%; background: var(--blue); color: #fff; padding: 10px 14px; border-radius: 16px 16px 4px 16px; font-size: 14px; line-height: 1.5; }
+  .msg-agent { display: flex; gap: 10px; align-items: flex-start; }
+  .agent-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--teal)); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; }
+  .agent-body { flex: 1; min-width: 0; }
+  .bubble-agent { background: var(--bg); border: 1px solid var(--border); border-radius: 4px 16px 16px 16px; padding: 12px 16px; font-size: 14px; line-height: 1.65; }
+  .bubble-agent h2 { font-size: 15px; color: var(--navy); margin: 14px 0 6px; }
+  .bubble-agent h3 { font-size: 14px; color: var(--blue); margin: 12px 0 4px; }
+  .bubble-agent ul, .bubble-agent ol { padding-left: 18px; margin: 6px 0; }
+  .bubble-agent li { margin-bottom: 3px; }
+  .bubble-agent strong { color: var(--navy); }
+  .bubble-agent p { margin-bottom: 6px; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .meta-badge { font-size: 11px; padding: 2px 8px; border-radius: 20px; }
+  .badge-green { background: #E6F4EA; color: var(--green); border: 1px solid #B7DFC0; }
+  .badge-blue  { background: #E8EEF8; color: var(--blue);  border: 1px solid #C0D0E8; }
+  .badge-gray  { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+  .typing { display: flex; gap: 5px; align-items: center; padding: 12px 16px; background: var(--bg); border: 1px solid var(--border); border-radius: 4px 16px 16px 16px; }
+  .dot-anim { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); animation: blink 1.2s ease-in-out infinite; }
+  .dot-anim:nth-child(2) { animation-delay: .2s; }
+  .dot-anim:nth-child(3) { animation-delay: .4s; }
+  @keyframes blink { 0%,100%{opacity:.3;transform:scale(.8)} 50%{opacity:1;transform:scale(1.1)} }
+
+  /* INPUT */
+  .input-row { display: flex; gap: 10px; }
+  .chat-input { flex: 1; padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 14px; font-family: inherit; resize: none; outline: none; transition: border .15s; }
+  .chat-input:focus { border-color: var(--blue); }
+  .send-btn { padding: 12px 20px; background: var(--navy); color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; transition: background .15s; }
+  .send-btn:hover:not(:disabled) { background: var(--blue); }
+  .send-btn:disabled { opacity: .4; cursor: default; }
+  .hint { font-size: 11px; color: var(--muted); text-align: center; }
+
+  /* EMPTY STATE */
+  .empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px; }
+  .empty-icon { font-size: 36px; margin-bottom: 12px; }
+  .empty h2 { font-size: 18px; font-weight: 600; margin-bottom: 6px; color: var(--navy); }
+  .empty p  { font-size: 13px; color: var(--muted); }
+
+  @media(max-width:768px){ .container{ grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">💰</div>
+    <div class="logo-text">
+      <h1>LoanGenie</h1>
+      <p>Personal Loan Eligibility & Advisory Agent</p>
+    </div>
+  </div>
+  <div class="badge">Powered by Amazon Bedrock · Nova Pro</div>
+</header>
+
+<div class="container">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+
+    <!-- API Connection -->
+    <div class="card">
+      <h3>API Connection</h3>
+      <div class="api-row">
+        <input class="api-input" id="apiUrl" placeholder="https://xxx.execute-api.us-east-1.amazonaws.com/prod/advise"/>
+        <button class="btn-connect" onclick="connect()">Connect</button>
+      </div>
+      <div class="status">
+        <div class="dot" id="statusDot"></div>
+        <span id="statusText" style="color:var(--muted)">Not connected — enter your API Gateway URL</span>
+      </div>
+    </div>
+
+    <!-- Quick Queries -->
+    <div class="card">
+      <h3>Quick Queries</h3>
+      <button class="quick-btn" onclick="setQuery('I earn 80000 per month with a credit score of 720. Am I eligible for a 500000 loan?')">💼 Check eligibility — ₹5L loan</button>
+      <button class="quick-btn" onclick="setQuery('What would my EMI be for a 600000 loan over 48 months at 12.5%?')">🧮 Calculate EMI — ₹6L @ 48 months</button>
+      <button class="quick-btn" onclick="setQuery('What documents do I need as a salaried applicant?')">📄 Documents — salaried</button>
+      <button class="quick-btn" onclick="setQuery('What documents do I need as a self-employed applicant?')">📄 Documents — self-employed</button>
+      <button class="quick-btn" onclick="setQuery('What is the interest rate range for personal loans?')">📊 Interest rate range</button>
+      <button class="quick-btn" onclick="setQuery('My income is 90000, credit score 760. Eligible for 700000? Show EMI over 36 months at 11% and documents needed.')">🎯 Full advisory — all 3</button>
+    </div>
+
+    <!-- Session Stats -->
+    <div class="card">
+      <h3>Session Stats</h3>
+      <div class="stat-grid">
+        <div class="stat-item"><div class="stat-val" id="st-queries">0</div><div class="stat-label">Queries</div></div>
+        <div class="stat-item"><div class="stat-val" id="st-latency">—</div><div class="stat-label">Avg Latency</div></div>
+        <div class="stat-item"><div class="stat-val" id="st-cost">$0</div><div class="stat-label">Est. Cost</div></div>
+        <div class="stat-item"><div class="stat-val" id="st-mode">—</div><div class="stat-label">Mode</div></div>
+      </div>
+    </div>
+
+    <!-- Architecture -->
+    <div class="card">
+      <h3>Architecture</h3>
+      <div style="font-size:12px;color:var(--muted);line-height:1.8">
+        <div>🤖 <span style="color:var(--blue)">Strands Agent</span> — Nova Pro</div>
+        <div>🔧 <span style="color:var(--blue)">Tools</span> — Eligibility + EMI</div>
+        <div>📚 <span style="color:var(--teal)">RAG</span> — Loan Products KB</div>
+        <div>💾 <span style="color:var(--muted)">Session Memory</span> — DynamoDB</div>
+        <div>🧠 <span style="color:var(--muted)">Long-Term</span> — AgentCore</div>
+        <div>🛡️ <span style="color:var(--green)">PII Redaction</span> — Active</div>
+        <div>📊 <span style="color:var(--green)">Observability</span> — CloudWatch</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-wrap">
+    <div class="chat-box" id="chatBox">
+      <div class="empty" id="emptyState">
+        <div class="empty-icon">💰</div>
+        <h2>LoanGenie is ready</h2>
+        <p>Connect your API Gateway URL, then ask about loan eligibility,<br>EMI calculations, interest rates, or required documents.</p>
+      </div>
+    </div>
+
+    <div class="input-row">
+      <textarea class="chat-input" id="msgInput" rows="2" placeholder="Ask about eligibility, EMI, rates, documents…" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();send()}"></textarea>
+      <button class="send-btn" id="sendBtn" onclick="send()" disabled>Send</button>
+    </div>
+    <div class="hint">Shift+Enter for new line · Enter to send · PII (Aadhaar, PAN) is automatically redacted</div>
+  </div>
+
+</div>
+
+<script>
+let API_URL = '';
+let connected = false;
+let queries = 0, totalLatency = 0, totalCost = 0;
+
+// Marked config
+marked.setOptions({ breaks: true, gfm: true });
+
+function connect() {
+  const url = document.getElementById('apiUrl').value.trim();
+  if (!url) { setStatus('error', 'Enter a URL first'); return; }
+  API_URL = url;
+  connected = true;
+  setStatus('connected', 'Connected — ready');
+  document.getElementById('sendBtn').disabled = false;
+}
+
+function setStatus(state, msg) {
+  const dot = document.getElementById('statusDot');
+  const txt = document.getElementById('statusText');
+  dot.className = 'dot ' + (state === 'connected' ? 'connected' : state === 'error' ? 'error' : '');
+  txt.textContent = msg;
+  txt.style.color = state === 'connected' ? 'var(--green)' : state === 'error' ? 'var(--orange)' : 'var(--muted)';
+}
+
+function setQuery(q) {
+  document.getElementById('msgInput').value = q;
+  document.getElementById('msgInput').focus();
+}
+
+function redactPII(text) {
+  const rules = [
+    { re: /\b\d{4}\s?\d{4}\s?\d{4}\b/g, tag: '[AADHAAR_REDACTED]' },
+    { re: /\b[A-Z]{5}\d{4}[A-Z]\b/g,     tag: '[PAN_REDACTED]' },
+    { re: /\b[6-9]\d{9}\b/g,              tag: '[PHONE_REDACTED]' },
+    { re: /\b[\w.-]+@[\w.-]+\.\w+\b/g,   tag: '[EMAIL_REDACTED]' },
+  ];
+  let found = [];
+  rules.forEach(r => { if (r.re.test(text)) { found.push(r.tag.replace(/[\[\]_REDACTED]/g,'')); text = text.replace(r.re, r.tag); } });
+  return { clean: text, found };
+}
+
+function appendUser(text) {
+  document.getElementById('emptyState')?.remove();
+  const box = document.getElementById('chatBox');
+  const d = document.createElement('div');
+  d.className = 'msg-user';
+  d.innerHTML = `<div class="bubble-user">${esc(text)}</div>`;
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+
+function appendTyping() {
+  const box = document.getElementById('chatBox');
+  const d = document.createElement('div');
+  d.className = 'msg-agent';
+  d.id = 'typing';
+  d.innerHTML = `<div class="agent-avatar">💰</div><div class="typing"><div class="dot-anim"></div><div class="dot-anim"></div><div class="dot-anim"></div><span style="font-size:12px;color:var(--muted);margin-left:6px">Analysing your query…</span></div>`;
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+  return d;
+}
+
+function appendAgent(text, meta) {
+  document.getElementById('typing')?.remove();
+  const box = document.getElementById('chatBox');
+  const d = document.createElement('div');
+  d.className = 'msg-agent';
+
+  const rendered = marked.parse(text);
+  let metaHtml = `<div class="meta-row">
+    <span class="meta-badge badge-blue">⏱ ${meta.latency}ms</span>
+    ${meta.pii?.length ? `<span class="meta-badge badge-gray">🔒 ${meta.pii.join(', ')} redacted</span>` : ''}
+    <span class="meta-badge badge-green">✅ RAG grounded</span>
+  </div>`;
+
+  d.innerHTML = `<div class="agent-avatar">💰</div>
+    <div class="agent-body">
+      <div class="bubble-agent">${rendered}</div>
+      ${metaHtml}
+    </div>`;
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+
+function appendError(msg) {
+  document.getElementById('typing')?.remove();
+  const box = document.getElementById('chatBox');
+  const d = document.createElement('div');
+  d.className = 'msg-agent';
+  d.innerHTML = `<div class="agent-avatar">💰</div><div class="agent-body"><div class="bubble-agent" style="border-left:3px solid var(--orange);background:#FEF6E7">⚠️ ${esc(msg)}</div></div>`;
+  box.appendChild(d);
+  box.scrollTop = box.scrollHeight;
+}
+
+async function send() {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text || !connected) return;
+
+  const { clean, found } = redactPII(text);
+  input.value = '';
+  appendUser(text);
+  const typing = appendTyping();
+
+  document.getElementById('sendBtn').disabled = true;
+  const start = Date.now();
+
+  try {
+    const res = await fetch(API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: clean })
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const latency = Date.now() - start;
+
+    const answer = data.response || data.answer || JSON.stringify(data);
+    appendAgent(answer, { latency, pii: found });
+
+    // Update stats
+    queries++;
+    totalLatency += latency;
+    totalCost += 0.004;  // ~$0.004 per query estimate
+    document.getElementById('st-queries').textContent = queries;
+    document.getElementById('st-latency').textContent = Math.round(totalLatency/queries) + 'ms';
+    document.getElementById('st-cost').textContent = '$' + totalCost.toFixed(3);
+    document.getElementById('st-mode').textContent = 'Live';
+
+  } catch(err) {
+    appendError(`${err.message} — check your API URL and CORS settings`);
+  } finally {
+    document.getElementById('sendBtn').disabled = false;
+    input.focus();
+  }
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+</script>
+</body>
+</html>
