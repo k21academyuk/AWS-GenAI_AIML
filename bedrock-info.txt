@@ -1,0 +1,51 @@
+Amazon Bedrock Overview
+
+
+Amazon Bedrock is a fully managed service that makes foundation models (FMs) from leading AI companies available through a single API. With Bedrock, you can access models from Anthropic, AI21 Labs, Cohere, Meta, Stability AI, and Amazon.
+
+
+Key Features:
+- Model choice and flexibility
+- Easy model customization with your data
+- Fully managed agents that execute complex tasks
+- Native support for Retrieval Augmented Generation (RAG)
+- Security and privacy built-in
+- Pay only for what you use
+
+
+Use Cases:
+Amazon Bedrock supports various generative AI applications including:
+- Text generation and summarization
+- Conversational AI and chatbots
+- Code generation and explanation
+- Image generation and editing
+- Question answering with RAG
+- Content creation and editing
+- Document analysis and extraction
+- Sentiment analysis
+
+
+Supported Models:
+Bedrock provides access to foundation models including:
+- Claude models from Anthropic: Claude 3.5 Sonnet, Claude 3 Opus, Claude 3 Haiku, Claude 3.5 Haiku
+- Llama models from Meta: Llama 3.1 in various sizes
+- Jurassic models from AI21 Labs
+- Command models from Cohere
+- Titan models from Amazon
+- Stable Diffusion from Stability AI
+
+
+Pricing and Availability:
+Amazon Bedrock offers on-demand and provisioned throughput pricing options. You pay only for what you use with no upfront commitments. The service is available in multiple AWS regions including US East, US West, and Europe.
+
+
+Security Features:
+- Data encryption at rest and in transit
+- VPC support for private connectivity
+- IAM integration for access control
+- Compliance with major standards (SOC, ISO, HIPAA eligible)
+- No data is used to train underlying models
+
+
+Performance:
+Bedrock provides low-latency inference with high throughput capabilities. Provisioned throughput options are available for consistent performance at scale.
