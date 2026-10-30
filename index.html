@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SupportBot AI – IT Help Desk</title>
+<style>
+  :root { --brand:#ff9900; --dark:#232f3e; --ok:#1d8102; --err:#d13212; --bg:#f2f3f3; --card:#fff; --muted:#5f6b7a; }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:"Segoe UI",Arial,sans-serif; background:var(--bg); color:#16191f; }
+  header { background:var(--dark); color:#fff; padding:14px 28px; display:flex; align-items:center; justify-content:space-between; }
+  header h1 { font-size:20px; margin:0; } header h1 span { color:var(--brand); }
+  header .user { font-size:14px; display:flex; gap:12px; align-items:center; }
+  main { max-width:860px; margin:32px auto; padding:0 16px; }
+  .card { background:var(--card); border-radius:10px; box-shadow:0 1px 4px rgba(0,0,0,.12); padding:28px; margin-bottom:24px; }
+  h2 { margin-top:0; font-size:20px; }
+  p.muted { color:var(--muted); margin-top:-6px; }
+  label { display:block; font-weight:600; margin:16px 0 6px; font-size:14px; }
+  input, textarea { width:100%; padding:10px 12px; border:1px solid #aab7b8; border-radius:6px; font:inherit; }
+  textarea { min-height:120px; resize:vertical; }
+  button { background:var(--brand); color:#16191f; border:0; border-radius:20px; padding:10px 22px; font-weight:700; cursor:pointer; font-size:14px; }
+  button.secondary { background:#fff; border:1px solid #aab7b8; }
+  button:disabled { opacity:.6; cursor:wait; }
+  .actions { margin-top:20px; display:flex; gap:12px; flex-wrap:wrap; }
+  .banner { padding:14px 16px; border-radius:6px; margin-bottom:18px; font-size:15px; display:none; }
+  .banner.ok { display:block; background:#e9f6e5; border:1px solid var(--ok); color:#0f4d00; }
+  .banner.err { display:block; background:#fdeeea; border:1px solid var(--err); color:#7a1a08; }
+  .banner.info { display:block; background:#eaf3fc; border:1px solid #0972d3; color:#033160; }
+  .pill { display:inline-block; padding:2px 10px; border-radius:12px; font-size:12px; font-weight:700; background:#e9ebed; margin-right:6px; }
+  .p-Critical { background:#d13212; color:#fff; } .p-High { background:#ff9900; } .p-Medium { background:#f2d64b; } .p-Low { background:#8fd18f; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th, td { text-align:left; padding:8px; border-bottom:1px solid #e9ebed; vertical-align:top; }
+  th { background:#fafafa; }
+  .hidden { display:none !important; }
+  .center { text-align:center; }
+  .spinner { display:inline-block; width:14px; height:14px; border:2px solid #16191f; border-right-color:transparent; border-radius:50%; animation:spin .8s linear infinite; vertical-align:-2px; margin-right:6px; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  footer { text-align:center; color:var(--muted); font-size:12px; margin:24px 0; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🤖 SupportBot <span>AI</span> – IT Help Desk</h1>
+  <div class="user hidden" id="userBox">
+    <span id="userLabel"></span>
+    <button class="secondary" onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<main>
+  <div id="banner" class="banner"></div>
+
+  <!-- Landing (signed out) -->
+  <section id="loginView" class="card center hidden">
+    <h2>Welcome to SupportBot AI</h2>
+    <p class="muted">Submit IT issues and let generative AI classify, prioritise and route them to the right team.</p>
+    <div class="actions" style="justify-content:center">
+      <button onclick="login()">Login with Cognito</button>
+    </div>
+  </section>
+
+  <!-- Ticket form (signed in) -->
+  <section id="appView" class="hidden">
+    <div class="card">
+      <h2 id="welcome">Welcome!</h2>
+      <p class="muted">Describe your issue. Amazon Bedrock (Mistral 7B) will classify it and notify the assigned team.</p>
+      <form id="ticketForm">
+        <label for="name">Your Name</label>
+        <input id="name" required placeholder="e.g. John Doe">
+        <label for="email">Email</label>
+        <input id="email" type="email" required placeholder="you@example.com">
+        <label for="description">Issue Description</label>
+        <textarea id="description" required placeholder="e.g. My laptop is not working"></textarea>
+        <div class="actions">
+          <button type="submit" id="submitBtn">Submit Ticket</button>
+          <button type="button" class="secondary hidden" id="viewBtn" onclick="loadTickets()">View All Tickets (IT Staff)</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="card hidden" id="ticketsCard">
+      <h2>All Tickets</h2>
+      <div id="ticketsBody"></div>
+    </div>
+  </section>
+</main>
+
+<footer>SupportBot AI · Amazon Bedrock · Lambda · API Gateway · DynamoDB · Cognito · K21Academy Hands-On Lab</footer>
+
+<script>
+/* =====================================================================
+   CONFIGURATION – replace ALL values below with your own (see lab guide)
+   ===================================================================== */
+const CONFIG = {
+  // API Gateway → supportbot-api → Stages → prod → Invoke URL + /tickets
+  API_ENDPOINT:   'https://touemvfg6l.execute-api.us-east-1.amazonaws.com/prod/tickets',
+  // Cognito → your user pool → Overview → User pool ID
+  USER_POOL_ID:   'us-east-1_SxjHSD8Wc',
+  // Cognito → App clients → supportbot-web → Client ID
+  CLIENT_ID:      '1d7fqe0g1anrjmrtigsve5q3cf',
+  // Cognito → Branding → Domain (with https://, no trailing slash)
+  COGNITO_DOMAIN: 'https://us-east-1sxjhsd8wc.auth.us-east-1.amazoncognito.com',
+  // CloudFront → Distribution domain name (with https://, NO trailing slash)
+  REDIRECT_URI:   'https://d297jsh1dsgtr.cloudfront.net'
+};
+const SCOPES = 'openid email phone';
+/* ===================================================================== */
+
+const $ = id => document.getElementById(id);
+
+function showBanner(type, html) { const b = $('banner'); b.className = 'banner ' + type; b.innerHTML = html; }
+function clearBanner() { $('banner').className = 'banner'; $('banner').innerHTML = ''; }
+function esc(s) { return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------- PKCE helpers (SPA client has no secret) ---------- */
+function randomString(len) {
+  const a = new Uint8Array(len); crypto.getRandomValues(a);
+  return Array.from(a, b => ('0' + b.toString(16)).slice(-2)).join('');
+}
+function base64url(buf) {
+  return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+async function pkceChallenge(verifier) {
+  return base64url(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier)));
+}
+function decodeJwt(token) {
+  const p = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+  return JSON.parse(decodeURIComponent(atob(p).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+}
+
+/* ---------- Auth ---------- */
+async function login() {
+  const verifier = randomString(32), state = randomString(16);
+  sessionStorage.setItem('pkce_verifier', verifier);
+  sessionStorage.setItem('oauth_state', state);
+  const params = new URLSearchParams({
+    response_type: 'code', client_id: CONFIG.CLIENT_ID, redirect_uri: CONFIG.REDIRECT_URI,
+    scope: SCOPES, state, code_challenge: await pkceChallenge(verifier), code_challenge_method: 'S256'
+  });
+  window.location.href = `${CONFIG.COGNITO_DOMAIN}/oauth2/authorize?${params}`;
+}
+
+function logout() {
+  sessionStorage.clear();
+  const params = new URLSearchParams({ client_id: CONFIG.CLIENT_ID, logout_uri: CONFIG.REDIRECT_URI });
+  window.location.href = `${CONFIG.COGNITO_DOMAIN}/logout?${params}`;
+}
+
+async function handleRedirect() {
+  const q = new URLSearchParams(window.location.search);
+  if (q.get('error')) {
+    showBanner('err', `Login error: <b>${esc(q.get('error'))}</b> ${esc(q.get('error_description') || '')}`);
+    history.replaceState({}, '', window.location.pathname);
+    return;
+  }
+  const code = q.get('code');
+  if (!code) return;
+  history.replaceState({}, '', window.location.pathname);   // remove ?code= from the URL
+
+  if (q.get('state') !== sessionStorage.getItem('oauth_state')) {
+    showBanner('err', 'Login failed: state mismatch. Please click Login again.'); return;
+  }
+  const res = await fetch(`${CONFIG.COGNITO_DOMAIN}/oauth2/token`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'authorization_code', client_id: CONFIG.CLIENT_ID, code,
+      redirect_uri: CONFIG.REDIRECT_URI, code_verifier: sessionStorage.getItem('pkce_verifier') || ''
+    })
+  });
+  const data = await res.json();
+  if (!res.ok) { showBanner('err', `Token exchange failed: <b>${esc(data.error || res.status)}</b>. Check CLIENT_ID and REDIRECT_URI.`); return; }
+  sessionStorage.setItem('id_token', data.id_token);
+  sessionStorage.removeItem('pkce_verifier'); sessionStorage.removeItem('oauth_state');
+}
+
+function currentUser() {
+  const t = sessionStorage.getItem('id_token');
+  if (!t) return null;
+  try {
+    const c = decodeJwt(t);
+    if (c.exp * 1000 < Date.now()) { sessionStorage.removeItem('id_token'); return null; }
+    return { token: t, username: c['cognito:username'] || c.email, email: c.email || '', groups: c['cognito:groups'] || [] };
+  } catch { return null; }
+}
+
+/* ---------- UI ---------- */
+function render() {
+  const u = currentUser();
+  $('loginView').classList.toggle('hidden', !!u);
+  $('appView').classList.toggle('hidden', !u);
+  $('userBox').classList.toggle('hidden', !u);
+  if (!u) return;
+  $('userLabel').textContent = `${u.username}${u.groups.length ? ' (' + u.groups.join(', ') + ')' : ''}`;
+  $('welcome').textContent = `Welcome, ${u.username}!`;
+  if (!$('email').value) $('email').value = u.email;
+  $('viewBtn').classList.toggle('hidden', !u.groups.includes('it-staff'));
+}
+
+async function callApi(method, body) {
+  const u = currentUser();
+  if (!u) { showBanner('err', 'Your session has expired. Please log in again.'); render(); throw new Error('no session'); }
+  let res;
+  try {
+    res = await fetch(CONFIG.API_ENDPOINT, {
+      method,
+      headers: { 'Content-Type': 'application/json', 'Authorization': u.token },  // ID token for the Cognito authorizer
+      body: body ? JSON.stringify(body) : undefined
+    });
+  } catch (e) {
+    throw new Error('Could not reach the API. Check API_ENDPOINT, that CORS is enabled on /tickets and that the API was redeployed to prod. For 4xx/5xx errors, check the supportbot-handler CloudWatch logs.');
+  }
+  let data = {};
+  try { data = await res.json(); } catch {}
+  if (!res.ok) throw new Error(`${res.status} – ${data.error || data.message || data.Message || 'Request failed'}`);
+  return data;
+}
+
+$('ticketForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = $('submitBtn');
+  btn.disabled = true; btn.innerHTML = '<span class="spinner"></span>Classifying with AI…';
+  showBanner('info', 'Submitting your ticket – Amazon Bedrock is classifying it. This can take a few seconds…');
+  try {
+    const r = await callApi('POST', {
+      name: $('name').value.trim(), email: $('email').value.trim(), description: $('description').value.trim()
+    });
+    showBanner('ok',
+      `✅ <b>Ticket submitted!</b> ID: <b>${esc(r.ticket_id)}</b> — Assigned to: <b>${esc(r.assigned_team)} team</b><br>
+       <span class="pill">${esc(r.category)}</span><span class="pill p-${esc(r.priority)}">${esc(r.priority)}</span>
+       The ${esc(r.assigned_team)} team has been notified by email.`);
+    $('description').value = '';
+  } catch (err) {
+    showBanner('err', `❌ Ticket submission failed: ${esc(err.message)}`);
+  } finally {
+    btn.disabled = false; btn.textContent = 'Submit Ticket';
+  }
+});
+
+async function loadTickets() {
+  $('ticketsCard').classList.remove('hidden');
+  $('ticketsBody').innerHTML = '<span class="spinner"></span>Loading tickets…';
+  try {
+    const data = await callApi('GET');
+    const items = Array.isArray(data) ? data : (data.tickets || data.items || []);
+    if (!items.length) { $('ticketsBody').innerHTML = '<p class="muted">No tickets found.</p>'; return; }
+    items.sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+    $('ticketsBody').innerHTML = `<table><tr><th>ID</th><th>Submitter</th><th>Description</th><th>Category</th><th>Priority</th><th>Team</th><th>Status</th></tr>
+      ${items.map(t => `<tr><td>${esc(t.ticket_id)}</td><td>${esc(t.name)}<br><small>${esc(t.email)}</small></td><td>${esc(t.description)}</td>
+      <td>${esc(t.category)}</td><td><span class="pill p-${esc(t.priority)}">${esc(t.priority)}</span></td><td>${esc(t.assigned_team)}</td><td>${esc(t.status)}</td></tr>`).join('')}</table>`;
+  } catch (err) {
+    $('ticketsBody').innerHTML = `<p class="muted">Could not load tickets: ${esc(err.message)}</p>`;
+  }
+}
+
+/* ---------- Start ---------- */
+(async () => {
+  if (CONFIG.API_ENDPOINT.includes('xxxxxxxxxx') || CONFIG.CLIENT_ID.startsWith('xxxx')) {
+    showBanner('err', '⚠️ index.html is not configured yet. Update the CONFIG values at the top of the script section (see the lab guide).');
+  }
+  try { await handleRedirect(); } catch (e) { showBanner('err', 'Login failed: ' + esc(e.message)); }
+  render();
+})();
+</script>
+</body>
+</html>
