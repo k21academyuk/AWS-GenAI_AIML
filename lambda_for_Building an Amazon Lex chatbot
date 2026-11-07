@@ -176,6 +176,7 @@ Travel Tip: ${generateWeatherAdvice(weatherData)}
     
     return buildResponse('Fulfilled', message, sessionAttributes, event);
   } catch (error) {
+    console.error('Weather Error:', error);
     return buildResponse(
       'Failed',
       `Sorry, I couldn't find weather data for ${city}. Please try another city.`,
@@ -216,6 +217,7 @@ Last Updated: ${conversionData.lastUpdated}
     
     return buildResponse('Fulfilled', message, sessionAttributes, event);
   } catch (error) {
+    console.error('Currency Error:', error);
     return buildResponse(
       'Failed',
       `Sorry, I couldn't convert ${fromCurrency} to ${toCurrency}. Please check the currency codes.`,
@@ -344,111 +346,147 @@ Would you like weather or currency info for ${destination}?
 // API INTEGRATION FUNCTIONS
 // ============================================
 
+// Shared helper: HTTPS GET that sends a User-Agent, checks the HTTP status,
+// and returns parsed JSON. Used by the weather and currency functions.
+function httpGetJson(url) {
+  return new Promise((resolve, reject) => {
+    const req = https.get(
+      url,
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; TravelIntelligenceBot/1.0)',
+          'Accept': 'application/json'
+        },
+        timeout: 10000
+      },
+      (res) => {
+        let body = '';
+        res.on('data', chunk => body += chunk);
+        res.on('end', () => {
+          console.log('HTTP status:', res.statusCode);
+
+          if (res.statusCode < 200 || res.statusCode >= 300) {
+            console.error('Non-2xx response (first 200 chars):', body.substring(0, 200));
+            reject(new Error(`API returned HTTP ${res.statusCode}`));
+            return;
+          }
+
+          try {
+            resolve(JSON.parse(body));
+          } catch (err) {
+            console.error('Not valid JSON (first 200 chars):', body.substring(0, 200));
+            reject(new Error('API did not return valid JSON'));
+          }
+        });
+      }
+    );
+
+    req.on('timeout', () => req.destroy(new Error('Request timed out')));
+    req.on('error', reject);
+  });
+}
+
 function fetchCountryData(countryName) {
   return new Promise((resolve, reject) => {
     const url = `https://restcountries.com/v3.1/name/${encodeURIComponent(countryName)}?fullText=false`;
-    
-    https.get(url, (res) => {
-      let body = '';
-      res.on('data', chunk => body += chunk);
-      res.on('end', () => {
-        try {
-          const data = JSON.parse(body);
-          if (!Array.isArray(data) || data.length === 0) {
-            reject(new Error('Country not found'));
+
+    const req = https.get(
+      url,
+      {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; TravelIntelligenceBot/1.0)',
+          'Accept': 'application/json'
+        },
+        timeout: 10000
+      },
+      (res) => {
+        let body = '';
+        res.on('data', chunk => body += chunk);
+        res.on('end', () => {
+          console.log('RestCountries HTTP status:', res.statusCode);
+
+          if (res.statusCode < 200 || res.statusCode >= 300) {
+            console.error('Non-2xx response (first 200 chars):', body.substring(0, 200));
+            reject(new Error(`API returned HTTP ${res.statusCode}`));
             return;
           }
-          
-          const country = data[0];
-          resolve({
-            name: country.name.common,
-            officialName: country.name.official,
-            capital: country.capital?.[0] || 'N/A',
-            code: country.cca2,
-            region: country.region,
-            subregion: country.subregion,
-            population: country.population?.toLocaleString(),
-            area: country.area ? `${country.area.toLocaleString()} km²` : 'N/A',
-            languages: country.languages ? Object.values(country.languages).join(', ') : 'N/A',
-            currencies: country.currencies ? Object.entries(country.currencies).map(([code, curr]) => `${curr.name} (${code})`).join(', ') : 'N/A',
-            currencyCode: country.currencies ? Object.keys(country.currencies)[0] : 'N/A',
-            timezone: country.timezones?.[0] || 'N/A',
-            flag: country.flag || '',
-            borders: country.borders || [],
-            latlng: country.latlng || []
-          });
-        } catch (err) {
-          reject(err);
-        }
-      });
-    }).on('error', reject);
+
+          try {
+            const data = JSON.parse(body);
+            if (!Array.isArray(data) || data.length === 0) {
+              reject(new Error('Country not found'));
+              return;
+            }
+
+            const country = data[0];
+            resolve({
+              name: country.name.common,
+              officialName: country.name.official,
+              capital: country.capital?.[0] || 'N/A',
+              code: country.cca2,
+              region: country.region,
+              subregion: country.subregion,
+              population: country.population?.toLocaleString(),
+              area: country.area ? `${country.area.toLocaleString()} km²` : 'N/A',
+              languages: country.languages ? Object.values(country.languages).join(', ') : 'N/A',
+              currencies: country.currencies ? Object.entries(country.currencies).map(([code, curr]) => `${curr.name} (${code})`).join(', ') : 'N/A',
+              currencyCode: country.currencies ? Object.keys(country.currencies)[0] : 'N/A',
+              timezone: country.timezones?.[0] || 'N/A',
+              flag: country.flag || '',
+              borders: country.borders || [],
+              latlng: country.latlng || []
+            });
+          } catch (err) {
+            console.error('Not valid JSON (first 200 chars):', body.substring(0, 200));
+            reject(err);
+          }
+        });
+      }
+    );
+
+    req.on('timeout', () => req.destroy(new Error('Request timed out')));
+    req.on('error', reject);
   });
 }
 
-function fetchWeather(city) {
-  return new Promise((resolve, reject) => {
-    const apiKey = CONFIG.WEATHER_API_KEY;
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
-    
-    https.get(url, (res) => {
-      let body = '';
-      res.on('data', chunk => body += chunk);
-      res.on('end', () => {
-        try {
-          const data = JSON.parse(body);
-          
-          if (data.cod !== 200) {
-            reject(new Error('Weather data not found'));
-            return;
-          }
-          
-          resolve({
-            city: data.name,
-            temp: Math.round(data.main.temp),
-            feelsLike: Math.round(data.main.feels_like),
-            description: data.weather[0].description,
-            humidity: data.main.humidity,
-            windSpeed: data.wind.speed,
-            icon: getWeatherEmoji(data.weather[0].main)
-          });
-        } catch (err) {
-          reject(err);
-        }
-      });
-    }).on('error', reject);
-  });
+async function fetchWeather(city) {
+  const apiKey = CONFIG.WEATHER_API_KEY;
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`;
+
+  const data = await httpGetJson(url);
+
+  if (Number(data.cod) !== 200) {
+    throw new Error('Weather data not found');
+  }
+
+  return {
+    city: data.name,
+    temp: Math.round(data.main.temp),
+    feelsLike: Math.round(data.main.feels_like),
+    description: data.weather[0].description,
+    humidity: data.main.humidity,
+    windSpeed: data.wind.speed,
+    icon: getWeatherEmoji(data.weather[0].main)
+  };
 }
 
-function fetchCurrencyConversion(from, to, amount) {
-  return new Promise((resolve, reject) => {
-    const url = `https://api.exchangerate-api.com/v4/latest/${from}`;
-    
-    https.get(url, (res) => {
-      let body = '';
-      res.on('data', chunk => body += chunk);
-      res.on('end', () => {
-        try {
-          const data = JSON.parse(body);
-          
-          if (!data.rates || !data.rates[to]) {
-            reject(new Error('Currency not found'));
-            return;
-          }
-          
-          const rate = data.rates[to];
-          const converted = (amount * rate).toFixed(2);
-          
-          resolve({
-            convertedAmount: converted,
-            rate: rate.toFixed(4),
-            lastUpdated: new Date(data.time_last_updated * 1000).toLocaleDateString()
-          });
-        } catch (err) {
-          reject(err);
-        }
-      });
-    }).on('error', reject);
-  });
+async function fetchCurrencyConversion(from, to, amount) {
+  const url = `https://api.exchangerate-api.com/v4/latest/${encodeURIComponent(from)}`;
+
+  const data = await httpGetJson(url);
+
+  if (!data.rates || !data.rates[to]) {
+    throw new Error('Currency not found');
+  }
+
+  const rate = data.rates[to];
+  const converted = (amount * rate).toFixed(2);
+
+  return {
+    convertedAmount: converted,
+    rate: rate.toFixed(4),
+    lastUpdated: new Date(data.time_last_updated * 1000).toLocaleDateString()
+  };
 }
 
 function getTravelRecommendations(budget, interests) {
